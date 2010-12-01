@@ -47,7 +47,4 @@ public class ExporterLIBSVMSparse extends ExporterHashLinear {
 		// TODO Auto-generated method stub
 		
 	}
-
-
-
 }

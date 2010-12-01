@@ -1,6 +1,7 @@
 package io.writer;
 
 import io.reader.RandomAccessMDLReader;
+import io.writer.feature.SortableFeature;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -19,50 +20,7 @@ import fingerprinters.features.FeatureMap;
 import fingerprinters.features.IFeature;
 
 public class ExporterSparseString implements IExporter {
-	int hashSpace;
-
-	public ExporterSparseString() {
-		this.hashSpace = (int) Math.pow(2, 16);
-	}
-
-	public ExporterSparseString(int hashSpace) {
-		if (hashSpace > 18) {
-			hashSpace = 18;
-		}
-		if (hashSpace < 8) {
-			hashSpace = 8;
-		}
-		this.hashSpace = hashSpace;
-	}
-
-	private class SortableFeature implements Comparable {
-		final IFeature pattern;
-		final int hash;
-
-		SortableFeature(IFeature feature) {
-			this.pattern = feature;
-			this.hash = feature.featureToString().hashCode();
-		}
-
-		public int getHash() {
-			return hash;
-		}
-
-		public double getValue() {
-			return pattern.getValue();
-		}
-
-		public String getString(){
-			return this.pattern.featureToString();
-		}
-
-		@Override
-		public int compareTo(Object that) {
-			return this.hash - ((SortableFeature) that).getHash();
-
-		}
-	}
-
+ 
 	@Override
 	public void export(RandomAccessMDLReader reader, EncodingFingerprint fingerprinter, String label, File outputFile) {
 

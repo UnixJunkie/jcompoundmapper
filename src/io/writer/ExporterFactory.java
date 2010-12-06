@@ -14,12 +14,14 @@ public class ExporterFactory {
 			return new ExporterSparseString();
 		} else if (type == ExporterType.BENCHMARKS) {
 			return new ExporterBenchmark();
+		} else if (type == ExporterType.WEKA_NOMINAL) {
+			return new ExporterSparseNominalWeka();
 		}
 		return new ExporterLIBSVMSparse();
 	}
 
 	public static enum ExporterType {
-		LIBSVM_SPARSE, LIBSVM_MATRIX, FULL_CSV, STRING_PATTERNS, WEKA_HASHED, BENCHMARKS;
+		LIBSVM_SPARSE, LIBSVM_MATRIX, FULL_CSV, STRING_PATTERNS, WEKA_HASHED, WEKA_NOMINAL, BENCHMARKS;
 	}
 
 	public static ExporterType getExporterType(int index) {
@@ -35,6 +37,8 @@ public class ExporterFactory {
 			return ExporterType.STRING_PATTERNS;
 		}else if (index == ExporterType.WEKA_HASHED.ordinal()) {
 			return ExporterType.WEKA_HASHED;
+		}else if (index == ExporterType.WEKA_NOMINAL.ordinal()) {
+			return ExporterType.WEKA_NOMINAL;
 		}
 		return ExporterType.LIBSVM_SPARSE;
 	}

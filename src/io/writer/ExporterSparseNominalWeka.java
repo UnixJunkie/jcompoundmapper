@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
@@ -18,13 +16,19 @@ import java.util.TreeMap;
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 import tools.progressbar.ProgressBar;
-
 import fingerprinters.EncodingFingerprint;
 import fingerprinters.features.FeatureMap;
 import fingerprinters.features.IFeature;
 
 public class ExporterSparseNominalWeka implements IExporter {
 
+	private int labelThreshold = 5;
+
+	public void setLabelThreshold(int labelThreshold) {
+		// System.out.println("yes it works:"+labelThreshold);
+		this.labelThreshold = labelThreshold;
+	}
+	
 	/**
 	 * generates a hash map with all features found in the data set
 	 * 
@@ -34,6 +38,7 @@ public class ExporterSparseNominalWeka implements IExporter {
 	 */
 	private TreeMap<IFeature, Integer> collectGlobalFeatures(RandomAccessMDLReader reader, EncodingFingerprint fingerprinter) {
 		// first round: collect all features
+		
 		TreeMap<IFeature, Integer> globalFeatureHashMap = new TreeMap<IFeature, Integer>();
 		for (int i = 0; i < reader.getSize(); i++) {
 			IAtomContainer mol = reader.getMol(i);
@@ -63,14 +68,14 @@ public class ExporterSparseNominalWeka implements IExporter {
 	/*
 	 * write a ARFF header
 	 */
-	private void writeHeader(TreeMap<IFeature, Integer> map, FileWriter fw) throws IOException {
+	private void writeHeader(TreeMap<IFeature, Integer> map, FileWriter fw, RandomAccessMDLReader reader, String label) throws IOException {
 		Set<IFeature> keys = map.keySet();
 		fw.append("@relation	MOLECULE\n");
 		Iterator<IFeature> iter = keys.iterator();
 		while (iter.hasNext()) {
 			fw.append("@ATTRIBUTE\t+" + iter.next().featureToString() + "\t{0,1}\n");
 		}
-		fw.append("@ATTRIBUTE	LABEL	{}\n\n");
+		fw.append("@ATTRIBUTE "+ getLabels(label, reader));
 		fw.append("@DATA\n");
 	}
 
@@ -81,12 +86,14 @@ public class ExporterSparseNominalWeka implements IExporter {
 		java.util.Locale.setDefault(java.util.Locale.ENGLISH);
 		DecimalFormat df = new DecimalFormat();
 		Long start = System.currentTimeMillis();
+		
+		
 		ProgressBar progressBar = new ProgressBar(reader.getSize());
 
 		try {
 			final FileWriter fw = new FileWriter(outputFile);
 			TreeMap<IFeature, Integer> globalFeatureHashMap = collectGlobalFeatures(reader, fingerprinter);
-			writeHeader(globalFeatureHashMap, fw);
+			writeHeader(globalFeatureHashMap, fw, reader, label);
 
 			for (int i = 0; i < reader.getSize(); i++) {
 				IAtomContainer mol = reader.getMol(i);
@@ -128,4 +135,33 @@ public class ExporterSparseNominalWeka implements IExporter {
 		}
 	}
 
+	protected String getLabels(String label, RandomAccessMDLReader reader) {
+		String labels = "NUMERIC";
+
+		Set<String> labelSet = reader.getAllLabelClasses(label);
+		ArrayList<String> listLabels = new ArrayList<String>(labelSet);
+		Collections.sort(listLabels);
+
+		int labelsCount = labelSet.size();
+		System.out.println("Labels found: "+ labelsCount);
+
+		if (labelsCount < labelThreshold) {
+			System.out.println("Below threshold, exporting as nominal classes instead of numeric class...");
+			labels = "{";
+
+			int c = 0;
+			for (String l : listLabels) {
+				if (c == 0) {
+					labels += l;
+				} else {
+					labels += "," + l;
+				}
+				c++;
+			}
+
+			labels += "}";
+		}
+		return labels;
+	}
+	
 }

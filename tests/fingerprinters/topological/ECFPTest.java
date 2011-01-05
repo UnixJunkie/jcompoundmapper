@@ -6,12 +6,12 @@ import org.junit.Test;
 import fingerprinters.GeneralFingerPrintTester;
 
 
-public class ExtendedConnectivityTest {
+public class ECFPTest {
 	static GeneralFingerPrintTester tester;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		tester = new GeneralFingerPrintTester(new Encoding2DExtendedConnectivity());
+		tester = new GeneralFingerPrintTester(new Encoding2DECFP());
 	}
 
 	@Test

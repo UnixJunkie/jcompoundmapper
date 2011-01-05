@@ -14,7 +14,7 @@ import fingerprinters.topological.Encoding2DAtomPair;
 import fingerprinters.topological.Encoding2DAtomTriple;
 import fingerprinters.topological.Encoding2DCATS;
 import fingerprinters.topological.DepthFirstSearch;
-import fingerprinters.topological.Encoding2DExtendedConnectivity;
+import fingerprinters.topological.Encoding2DECFPVariant;
 import fingerprinters.topological.Encoding2D;
 import fingerprinters.topological.Encoding2DLocalAtomEnvironment;
 import fingerprinters.topological.Encoding2DMolprint;
@@ -55,7 +55,7 @@ public class TrieFeatureMapTest {
 		exportTriePharmacophore(sdReader, new Encoding2DPharmacophore3Point(), new File("c:\\temp\\Aspirin-Pharmacophore3Point2D.gml"));
 		exportTriePharmacophore(sdReader, new Encoding3DPharmacophore2Point(), new File("c:\\temp\\Aspirin-Pharmacophore2Point3D.gml"));
 		exportTriePharmacophore(sdReader, new Encoding3DPharmacophore3Point(), new File("c:\\temp\\Aspirin-Pharmacophore3Point3D.gml"));
-		exportTrie(sdReader, new Encoding2DExtendedConnectivity(), new File("c:\\temp\\Aspirin-ExtendedConnectivity.gml"));
+		exportTrie(sdReader, new Encoding2DECFPVariant(), new File("c:\\temp\\Aspirin-ExtendedConnectivity.gml"));
 		exportTrie(sdReader, new Encoding2DLocalAtomEnvironment(), new File("c:\\temp\\Aspirin-LocalAtomEnvironmentsStar.gml"));
 		exportTrie(sdReader, new Encoding2DMolprint(), new File("c:\\temp\\Aspirin-Molprint2D.gml"));
 		exportTrie(sdReader, new Encoding3DMolprint(), new File("c:\\temp\\Aspirin-Molprint3D.gml"));

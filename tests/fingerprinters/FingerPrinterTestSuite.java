@@ -14,7 +14,8 @@ import fingerprinters.topological.AtomPair2DTest;
 import fingerprinters.topological.AtomTriple2DTest;
 import fingerprinters.topological.CATS2DKeyTest;
 import fingerprinters.topological.DepthFirstSearchTest;
-import fingerprinters.topological.ExtendedConnectivityTest;
+import fingerprinters.topological.ECFPTest;
+import fingerprinters.topological.ECFPVariantTest;
 import fingerprinters.topological.LocalAtomEnvironmentsStarTest;
 import fingerprinters.topological.Molprint2DTest;
 import fingerprinters.topological.Pharmacophore2Point2DTest;
@@ -36,7 +37,8 @@ import fingerprinters.topological.SHEDKeyTest;
 	AtomPair2DTest.class,
 	AtomTriple2DTest.class,
 	CATS2DKeyTest.class,
-	ExtendedConnectivityTest.class,
+	ECFPVariantTest.class,
+	ECFPTest.class,
 	LocalAtomEnvironmentsStarTest.class,
 	Molprint2DTest.class,
 	Pharmacophore2Point2DTest.class,

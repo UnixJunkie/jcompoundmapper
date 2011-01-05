@@ -12,7 +12,8 @@ import fingerprinters.topological.Encoding2DAllShortestPath;
 import fingerprinters.topological.Encoding2DAtomPair;
 import fingerprinters.topological.Encoding2DAtomTriple;
 import fingerprinters.topological.Encoding2DCATS;
-import fingerprinters.topological.Encoding2DExtendedConnectivity;
+import fingerprinters.topological.Encoding2DECFP;
+import fingerprinters.topological.Encoding2DECFPVariant;
 import fingerprinters.topological.Encoding2DLocalAtomEnvironment;
 import fingerprinters.topological.Encoding2DMolprint;
 import fingerprinters.topological.Encoding2DPharmacophore2Point;
@@ -37,7 +38,9 @@ public class FingerPrinterFactory {
 		} else if (type == FingerprintType.DFS) {
 			return new Encoding2DAllPaths();
 		} else if (type == FingerprintType.ECFP) {
-			return new Encoding2DExtendedConnectivity();
+			return new Encoding2DECFP();
+		} else if (type == FingerprintType.ECFPVariant) {
+			return new Encoding2DECFPVariant();
 		} else if (type == FingerprintType.LSTAR) {
 			return new Encoding2DLocalAtomEnvironment();
 		} else if (type == FingerprintType.PHAP2POINT2D) {
@@ -57,7 +60,7 @@ public class FingerPrinterFactory {
 		} else if (type == FingerprintType.CATS3D) {
 			return new Encoding3DCATS();
 		} else if (type == FingerprintType.ECFP) {
-			return new Encoding2DExtendedConnectivity();
+			return new Encoding2DECFPVariant();
 		}
 		throw new FingerPrinterException(ErrorCode.UNKNOWN_FINGERPRINTER_TYPE,FingerPrinterFactory.class.toString(),type.toString());
 	}
@@ -88,6 +91,8 @@ public class FingerPrinterFactory {
 		PHAP3POINT3D,
 
 		ECFP,
+		
+		ECFPVariant,
 
 		LSTAR,
 		
@@ -96,47 +101,5 @@ public class FingerPrinterFactory {
 		RAD2D,
 
 		RAD3D;
-	}
-	
-	public static FingerprintType getFingerPrintType(int index) throws FingerPrinterException {
-		if (index == FingerprintType.DFS.ordinal()) {
-			return FingerprintType.DFS;
-		} else if (index == FingerprintType.RAD2D.ordinal()) {
-			return FingerprintType.RAD2D;
-		} else if (index == FingerprintType.RAD3D.ordinal()) {
-			return FingerprintType.RAD3D;
-		} else if (index == FingerprintType.AP2D.ordinal()) {
-			return FingerprintType.AP2D;
-		} else if (index == FingerprintType.ASP.ordinal()) {
-			return FingerprintType.ASP;
-		} else if (index == FingerprintType.AT2D.ordinal()) {
-			return FingerprintType.AT2D;
-		} else if (index == FingerprintType.CATS2D.ordinal()) {
-			return FingerprintType.CATS2D;
-		} else if (index == FingerprintType.ECFP.ordinal()) {
-			return FingerprintType.ECFP;
-		} else if (index == FingerprintType.PHAP2POINT2D.ordinal()) {
-			return FingerprintType.PHAP2POINT2D;
-		} else if (index == FingerprintType.PHAP3POINT2D.ordinal()) {
-			return FingerprintType.PHAP3POINT2D;
-		} else if (index == FingerprintType.PHAP2POINT3D.ordinal()) {
-			return FingerprintType.PHAP2POINT3D;
-		} else if (index == FingerprintType.PHAP3POINT3D.ordinal()) {
-			return FingerprintType.PHAP3POINT3D;
-		} else if (index == FingerprintType.AP3D.ordinal()) {
-			return FingerprintType.AP3D;
-		} else if (index == FingerprintType.AT3D.ordinal()) {
-			return FingerprintType.AT3D;
-		} else if (index == FingerprintType.CATS3D.ordinal()) {
-			return FingerprintType.CATS3D;
-		}else if (index == FingerprintType.LSTAR.ordinal()) {
-			return FingerprintType.LSTAR;
-		}else if (index == FingerprintType.LSTAR.ordinal()) {
-				return FingerprintType.LSTAR;
-		}else if (index == FingerprintType.SHED.ordinal()) {
-			return FingerprintType.SHED;
-		}
-		
-		throw new FingerPrinterException(ErrorCode.UNKNOWN_FINGERPRINTER_INDEX,FingerPrinterFactory.class.toString(),Integer.toString(index));
 	}
 }

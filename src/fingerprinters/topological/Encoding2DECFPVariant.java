@@ -21,16 +21,16 @@ import tools.moltyping.enumerations.EnumerationsAtomTypes.AtomLabelType;
 import fingerprinters.FingerPrinterException;
 import fingerprinters.features.IFeature;
 import fingerprinters.topological.features.DanglingBond;
-import fingerprinters.topological.features.ECFPFeature;
+import fingerprinters.topological.features.ECFPVariantFeature;
 
-public class Encoding2DExtendedConnectivity extends Encoding2D {
+public class Encoding2DECFPVariant extends Encoding2D {
 	private int currentIteration;
 	private ArrayList<IFeature> completeFeatures;
 	private IAtomContainer molecule;
 	private Map<IAtom, Integer> hashedAtomLabels;
-	private Map<IAtom, ECFPFeature> featuresOfLastIteration;
+	private Map<IAtom, ECFPVariantFeature> featuresOfLastIteration;
 
-	public Encoding2DExtendedConnectivity() {
+	public Encoding2DECFPVariant() {
 		super.setSearchDepth(4);
 		super.setAtomLabelType(AtomLabelType.DAYLIGHT_INVARIANT_RING);
 	}
@@ -59,7 +59,7 @@ public class Encoding2DExtendedConnectivity extends Encoding2D {
 	
 	private void initialize() throws MoltyperException, FingerPrinterException{
 		this.hashedAtomLabels = new HashMap<IAtom, Integer>();
-		this.featuresOfLastIteration = new HashMap<IAtom, ECFPFeature>();
+		this.featuresOfLastIteration = new HashMap<IAtom, ECFPVariantFeature>();
 		this.currentIteration = 0;
 		this.completeFeatures = new ArrayList<IFeature>();
 	}
@@ -69,7 +69,7 @@ public class Encoding2DExtendedConnectivity extends Encoding2D {
 			int hashCode = this.getAtomLabel(atom).hashCode();
 			IMolecule substructure = new Molecule();
 			substructure.addAtom(atom);
-			ECFPFeature ecfpFeature = new ECFPFeature(hashCode, atom, substructure,
+			ECFPVariantFeature ecfpFeature = new ECFPVariantFeature(hashCode, atom, substructure,
 													this.generateExtensionBondList(atom), this.currentIteration);
 			this.hashedAtomLabels.put(atom, hashCode);
 			this.featuresOfLastIteration.put(atom, ecfpFeature);
@@ -89,7 +89,7 @@ public class Encoding2DExtendedConnectivity extends Encoding2D {
 	}
 
 	private void computeIteration() throws FingerPrinterException, MoltyperException {
-		List<ECFPFeature> newFeatures = new ArrayList<ECFPFeature>();
+		List<ECFPVariantFeature> newFeatures = new ArrayList<ECFPVariantFeature>();
 		
 		for (IAtom atom : this.hashedAtomLabels.keySet()) {
 			newFeatures.add(this.computeIterationForAtom(atom));
@@ -99,8 +99,8 @@ public class Encoding2DExtendedConnectivity extends Encoding2D {
 		this.completeFeatures.addAll(newFeatures);
 	}
 
-	private ECFPFeature computeIterationForAtom(IAtom atom) throws FingerPrinterException, MoltyperException {
-		final ECFPFeature oldFeature = this.featuresOfLastIteration.get(atom);
+	private ECFPVariantFeature computeIterationForAtom(IAtom atom) throws FingerPrinterException, MoltyperException {
+		final ECFPVariantFeature oldFeature = this.featuresOfLastIteration.get(atom);
 		final IMolecule newSubstructure = oldFeature.getNonDeepCloneOfSubstructure();
 		final int numDanglingBonds = oldFeature.numberOfDanglingBonds();
 
@@ -139,7 +139,7 @@ public class Encoding2DExtendedConnectivity extends Encoding2D {
 		final DanglingBond[] newDanglingBonds = newConnectionCandidates.values().toArray(
 				new DanglingBond[newConnectionCandidates.size()]);
 		final int featureHashCode = this.computeFeatureHash(oldFeature.hashToInteger(), connections);
-		final ECFPFeature newFeature = new ECFPFeature(featureHashCode, atom, newSubstructure, newDanglingBonds,
+		final ECFPVariantFeature newFeature = new ECFPVariantFeature(featureHashCode, atom, newSubstructure, newDanglingBonds,
 				this.currentIteration);
 		this.featuresOfLastIteration.put(atom, newFeature);
 		return newFeature;
@@ -183,25 +183,25 @@ public class Encoding2DExtendedConnectivity extends Encoding2D {
 		return "ECFP";
 	}
 
-	private boolean hasDuplicate(ECFPFeature feature) {
+	private boolean hasDuplicate(ECFPVariantFeature feature) {
 		for (final IFeature f : this.completeFeatures) {
-			if (feature.hasEqualSubstructure((ECFPFeature) f)) {
+			if (feature.hasEqualSubstructure((ECFPVariantFeature) f)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private void removeDuplicateSubstructures(List<ECFPFeature> newFeatures) {
-		final Iterator<ECFPFeature> iter = newFeatures.iterator();
+	private void removeDuplicateSubstructures(List<ECFPVariantFeature> newFeatures) {
+		final Iterator<ECFPVariantFeature> iter = newFeatures.iterator();
 
 		while (iter.hasNext()) {
-			final ECFPFeature featureToCheck = iter.next();
+			final ECFPVariantFeature featureToCheck = iter.next();
 			if (this.hasDuplicate(featureToCheck)) {
 				iter.remove();
 				continue;
 			}
-			for (final ECFPFeature feature : newFeatures) {
+			for (final ECFPVariantFeature feature : newFeatures) {
 				if (feature != featureToCheck && featureToCheck.hasEqualSubstructure(feature)) {
 					if (featureToCheck.hashToInteger() >= feature.hashToInteger()) {
 						iter.remove();

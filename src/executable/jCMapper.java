@@ -9,6 +9,7 @@ import io.writer.IExporter;
 import io.writer.ExporterFactory.ExporterType;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -19,7 +20,6 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import tools.moltyping.enumerations.EnumerationsAtomTypes;
 import tools.moltyping.enumerations.EnumerationsAtomTypes.AtomLabelType;
 import distance.DistanceFactory;
 import distance.DistanceFactory.DistanceType;
@@ -45,19 +45,35 @@ public class jCMapper {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args){
 		java.util.Locale.setDefault(java.util.Locale.ENGLISH);
 		final jCMapper molprinter = new jCMapper();
 		Options options = molprinter.buildCommandLine();
-		molprinter.parseCommandLine(args, options);
+		
+		try{
+			molprinter.parseCommandLine(args, options);
+		}catch(ParseException pe){
+			if(pe.getMessage().substring(0,24).equals("Please check your input:"))
+				pe.printStackTrace();
+			else
+				System.out.println(pe.getMessage());
+			System.exit(1);
+		}
+		
 		molprinter.printInfos();
-		molprinter.exportFingerprintFile();
+		
+		try{
+			molprinter.exportFingerprintFile();
+		}catch(IOException ioe){
+			ioe.printStackTrace();
+			System.exit(1);
+		}
 	}
 
 	/**
 	 * read compounds and export
 	 */
-	private void exportFingerprintFile() throws Exception {
+	private void exportFingerprintFile() throws IOException {
 		RandomAccessMDLReader reader = null;
 		try {
 			reader = new RandomAccessMDLReader(new File(sdFileInputData));
@@ -177,15 +193,13 @@ public class jCMapper {
 		StringBuffer optionString = new StringBuffer();
 		for(int i=0; i<options.length; i++){
 			optionString.append(options[i]);
-			optionString.append(": ");
-			optionString.append(options[i].ordinal());
 			if(i<options.length-1)
 				optionString.append(", ");
 		}
 		return optionString.toString();
 	}
 
-	private void parseCommandLine(String[] args, Options options) {
+	private void parseCommandLine(String[] args, Options options) throws ParseException {
 		CommandLine lvCmd = null;
 		final HelpFormatter lvFormater = new HelpFormatter();
 		final CommandLineParser lvParser = new BasicParser();
@@ -207,13 +221,11 @@ public class jCMapper {
 		try {
 			if (lvCmd.hasOption("c")) {
 				try {
-					int index;
-					index = new Integer(lvCmd.getOptionValue("c"));
-					fingerprintType = FingerPrinterFactory.getFingerPrintType(index);
+					String fingerprintName = lvCmd.getOptionValue("c");
+					fingerprintType = FingerPrinterFactory.FingerprintType.valueOf(fingerprintName);
 					fingerprintEncoding = FingerPrinterFactory.getFingerprinter(fingerprintType);
 				} catch (Exception e) {
-					System.out.println("Error parsing integer value for encoding type. Please check your input.");
-					System.exit(1);
+					throw new ParseException("Error parsing name of encoding type. Please check your input.");
 				}
 			}
 			if (lvCmd.hasOption("f")) {
@@ -227,31 +239,27 @@ public class jCMapper {
 				System.out.println("Output filename: " + outFile);
 			}
 			if (lvCmd.hasOption("m")) {
-				int distance;
+				String distance;
 				try {
-					distance = new Integer(lvCmd.getOptionValue("m"));
-					distanceType = DistanceFactory.getFingerPrintType(distance);
+					distance = lvCmd.getOptionValue("m");
+					distanceType = DistanceFactory.DistanceType.valueOf(distance);
 				} catch (Exception e) {
-					System.out.println("Error parsing integer value for similarity measure. Please check your input.");
-					System.exit(1);
+					throw new ParseException("Error parsing name of similarity measure. Please check your input.");
 				}
 			}
 			if (lvCmd.hasOption("ff")) {
 				try {
-					int formatOutFile = 0;
-					formatOutFile = new Integer(lvCmd.getOptionValue("ff"));
-					exporterType = ExporterFactory.getExporterType(formatOutFile);
+					String formatOutFile = lvCmd.getOptionValue("ff");
+					exporterType = ExporterType.valueOf(formatOutFile);
 				} catch (Exception e) {
-					System.out.println("Error parsing integer value for format type. Please check your input.");
-					System.exit(1);
+					throw new ParseException("Error parsing name of format type. Please check your input.");
 				}
 			}
 			if (lvCmd.hasOption("lt")) {
 				try {					
 					labelThreshold = new Integer(lvCmd.getOptionValue("lt"));					
 				} catch (Exception e) {
-					System.out.println("Error parsing integer value for format type. Please check your input.");
-					System.exit(1);
+					throw new ParseException("Error parsing integer value for format type. Please check your input.");
 				}
 			}
 			if (lvCmd.hasOption("l")) {
@@ -259,20 +267,18 @@ public class jCMapper {
 			}
 			if (lvCmd.hasOption("a")) {
 				try {
-					final int atomType = new Integer(lvCmd.getOptionValue("a"));
-					final AtomLabelType atomLabelType = EnumerationsAtomTypes.getAtomLabeltypeForIndex(atomType);
+					final String atomType = lvCmd.getOptionValue("a");
+					final AtomLabelType atomLabelType = AtomLabelType.valueOf(atomType);
 					fingerprintEncoding.setAtomLabelType(atomLabelType);
 				} catch (Exception e) {
-					System.out.println("Error parsing integer value for atom type. Please check your input.");
-					System.exit(1);
+					throw new ParseException("Error parsing name of atom type. Please check your input.");
 				}
 			}
 			if (lvCmd.hasOption("hs")) {
 				try {
 					this.hashSpaceSize = new Integer(lvCmd.getOptionValue("hs"));
 				} catch (Exception e) {
-					System.out.println("Error parsing integer value for size of the hash space. Please check your input.");
-					System.exit(1);
+					throw new ParseException("Error parsing integer value for size of the hash space. Please check your input.");
 				}
 			}
 			if (lvCmd.hasOption("d")) {
@@ -285,8 +291,7 @@ public class jCMapper {
 						((Encoding3D) fingerprintEncoding).setDistanceCutoff((int) distanceCutOff);
 					}
 				} catch (Exception e) {
-					System.out.println("Error parsing double value for distance cutoff. Please check your input.");
-					System.exit(1);
+					throw new ParseException("Error parsing double value for distance cutoff. Please check your input.");
 				}
 			}
 			if (lvCmd.hasOption("s")) {
@@ -301,9 +306,9 @@ public class jCMapper {
 				}
 			}
 		} catch (final Exception e) {
-			e.printStackTrace();
-			System.err.println("Please check your input.");
-			System.exit(1);
+			ParseException pe = new ParseException("Please check your input: "+e.getMessage());
+			pe.setStackTrace(e.getStackTrace());
+			throw pe;
 		}
 	}
 }

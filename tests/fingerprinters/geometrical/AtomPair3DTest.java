@@ -5,26 +5,29 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import tools.moltyping.enumerations.EnumerationsAtomTypes.AtomLabelType;
-
-import fingerprinters.GeneralFingerPrintTester;
+import fingerprinters.SameMoleculeTester;
 
 public class AtomPair3DTest {
-	static GeneralFingerPrintTester tester;
+	static SameMoleculeTester tester;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		Encoding3DAtomPair fingerprint = new Encoding3DAtomPair();
-		tester = new GeneralFingerPrintTester(fingerprint);
+		tester = new SameMoleculeTester(new Encoding3DAtomPair());
 	}
 
 	@Test
-	public void computeMatrix() {
-		 tester.checkMatrix();
-  	}
-
-	@Test 
-	public void benchmarkMatrix() {
-		tester.benchmarkMatrix();
+	public void checkLength() {
+		tester.checkLength();
+	}
+	
+	@Test
+	public void checkFeatures() {
+		tester.checkFeatures();
+	}
+	
+	@Test
+	public void checkHashedFeatures() {
+		tester.checkHashedFeatures();
 	}
 	
 	@Test

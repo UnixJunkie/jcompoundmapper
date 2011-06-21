@@ -3,24 +3,29 @@ package fingerprinters.geometrical;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import fingerprinters.GeneralFingerPrintTester;
+import fingerprinters.SameMoleculeTester;
 
 
 public class Pharmacophore2Point3DTest {
-	static GeneralFingerPrintTester tester;
+	static SameMoleculeTester tester;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		tester = new GeneralFingerPrintTester(new Encoding3DPharmacophore2Point());
+		tester = new SameMoleculeTester(new Encoding3DPharmacophore2Point());
 	}
 
 	@Test
-	public void computeMatrix() {
-		tester.checkMatrix();
+	public void checkLength() {
+		tester.checkLength();
 	}
-
+	
 	@Test
-	public void benchmarkMatrix() {
-		tester.benchmarkMatrix();
+	public void checkFeatures() {
+		tester.checkFeatures();
+	}
+	
+	@Test
+	public void checkHashedFeatures() {
+		tester.checkHashedFeatures();
 	}
 }

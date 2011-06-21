@@ -3,25 +3,29 @@ package fingerprinters.topological;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import fingerprinters.GeneralFingerPrintTester;
+import fingerprinters.SameMoleculeTester;
 
 
 public class CATS2DKeyTest {
-	static GeneralFingerPrintTester tester;
+	static SameMoleculeTester tester;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		tester = new GeneralFingerPrintTester(new Encoding2DCATS());
+		tester = new SameMoleculeTester(new Encoding2DCATS());
 	}
 
-	@Test 
-	public void computeMatrix() {
-		tester.checkMatrix();
+	@Test
+	public void checkLength() {
+		tester.checkLength();
 	}
-
-	@Test 
-	public void benchmarkMatrix() {
-		tester.benchmarkMatrix();
-
+	
+	@Test
+	public void checkFeatures() {
+		tester.checkFeatures();
+	}
+	
+	@Test
+	public void checkHashedFeatures() {
+		tester.checkHashedFeatures();
 	}
 }

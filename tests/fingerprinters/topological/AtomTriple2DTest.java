@@ -3,24 +3,28 @@ package fingerprinters.topological;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import fingerprinters.GeneralFingerPrintTester;
+import fingerprinters.SameMoleculeTester;
 
 public class AtomTriple2DTest {
-	static GeneralFingerPrintTester tester;
+	static SameMoleculeTester tester;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		tester = new GeneralFingerPrintTester(new Encoding2DAtomTriple());
+		tester = new SameMoleculeTester(new Encoding2DAtomTriple());
 	}
 
 	@Test
-	public void computeMatrix() {
-		tester.checkMatrix();
+	public void checkLength() {
+		tester.checkLength();
 	}
-
+	
 	@Test
-	public void benchmarkMatrix() {
-		tester.benchmarkMatrix();
-
+	public void checkFeatures() {
+		tester.checkFeatures();
+	}
+	
+	@Test
+	public void checkHashedFeatures() {
+		tester.checkHashedFeatures();
 	}
 }

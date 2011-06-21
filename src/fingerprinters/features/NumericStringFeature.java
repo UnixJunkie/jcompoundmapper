@@ -1,5 +1,8 @@
 package fingerprinters.features;
 
+import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IBond;
+
 public class NumericStringFeature implements IFeature {
 
 	private final String feature;
@@ -32,9 +35,21 @@ public class NumericStringFeature implements IFeature {
 	public double getValue() {
 		return this.value;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		return this.hashCode;
+	}
+
+	@Override
+	public Iterable<IAtom> representedAtoms() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Iterable<IBond> representedBonds() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

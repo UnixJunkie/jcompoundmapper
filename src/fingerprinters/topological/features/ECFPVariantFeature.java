@@ -1,5 +1,8 @@
 package fingerprinters.topological.features;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IBond;
@@ -56,15 +59,26 @@ public class ECFPVariantFeature extends ECFPFeature {
 	}
 
 	public boolean hasEqualSubstructure(ECFPVariantFeature arg) {
-		if (arg.substructure.getAtomCount() != this.substructure.getAtomCount()) {
+		if (arg.representedSubstructure().getAtomCount() != this.representedSubstructure().getAtomCount()) {
 			return false;
 		}
-		for (final IAtom atom : arg.substructure.atoms()) {
-			if (!this.substructure.contains(atom)) {
+		for (final IAtom atom : arg.representedSubstructure().atoms()) {
+			if (!this.representedSubstructure().contains(atom)) {
 				return false;
 			}
 		}
 		return true;
 	}
-
+	
+	@Override
+	public Iterable<IBond> representedBonds(){
+		List<IBond> bonds = new LinkedList<IBond>();
+		for(IBond bond: this.representedSubstructure().bonds()){
+			bonds.add(bond);
+		}
+		for(DanglingBond bond: connectivityBonds){
+			bonds.add(bond.getBond());
+		}
+		return bonds;
+	}
 }

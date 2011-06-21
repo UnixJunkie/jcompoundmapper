@@ -88,12 +88,12 @@ public class Encoding2DECFP extends Encoding2D {
 	private ECFPFeature computeIterationForAtom(IAtom atom) throws FingerPrinterException, MoltyperException{
 		ECFPFeature oldFeature = featuresOfLastIteration.get(atom);
 		IMolecule newSubstructure = oldFeature.getNonDeepCloneOfSubstructure();
-		List<BondOrderIdentifierTupel> connectivity = new ArrayList<BondOrderIdentifierTupel>(atom.getFormalNeighbourCount());
+		List<BondOrderIdentifierTupel> connectivity = new ArrayList<BondOrderIdentifierTupel>();
 
 		for(IAtom connectedAtom: molecule.getConnectedAtomsList(atom)){
-			int identifierOfConnectedAtom = featuresOfLastIteration.get(connectedAtom).hashToInteger();
+			int identifierOfConnectedAtom = featuresOfLastIteration.get(connectedAtom).hashCode();
 			connectivity.add(new BondOrderIdentifierTupel(this.getBondOrder(molecule.getBond(atom,connectedAtom)),identifierOfConnectedAtom));
-			IMolecule structure = this.featuresOfLastIteration.get(connectedAtom).substructure;
+			IMolecule structure = this.featuresOfLastIteration.get(connectedAtom).representedSubstructure();
 			for(IAtom a: structure.atoms()){
 				if(!newSubstructure.contains(a))
 					newSubstructure.addAtom(a);
@@ -104,7 +104,7 @@ public class Encoding2DECFP extends Encoding2D {
 			}
 		}
 		
-		int featureHashCode = computeFeatureHash(oldFeature.hashToInteger(),connectivity);
+		int featureHashCode = computeFeatureHash(oldFeature.hashCode(),connectivity);
 		ECFPFeature newFeature = new ECFPFeature(featureHashCode, atom, newSubstructure, this.iteration);
 		return newFeature;
 	}
@@ -136,7 +136,7 @@ public class Encoding2DECFP extends Encoding2D {
 			}
 			for(ECFPFeature feature: newFeatures){
 				if(feature!=featureToCheck && featureToCheck.representsSameSubstructures(feature)){
-					if(featureToCheck.hashToInteger()>=feature.hashToInteger()){
+					if(featureToCheck.hashCode()>=feature.hashCode()){
 						iter.remove();
 						break;
 					}

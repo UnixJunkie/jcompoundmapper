@@ -10,7 +10,6 @@ import java.util.Map;
 
 import org.openscience.cdk.CDKConstants;
 import org.openscience.cdk.Molecule;
-import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
@@ -138,7 +137,7 @@ public class Encoding2DECFPVariant extends Encoding2D {
 		
 		final DanglingBond[] newDanglingBonds = newConnectionCandidates.values().toArray(
 				new DanglingBond[newConnectionCandidates.size()]);
-		final int featureHashCode = this.computeFeatureHash(oldFeature.hashToInteger(), connections);
+		final int featureHashCode = this.computeFeatureHash(oldFeature.hashCode(), connections);
 		final ECFPVariantFeature newFeature = new ECFPVariantFeature(featureHashCode, atom, newSubstructure, newDanglingBonds,
 				this.currentIteration);
 		this.featuresOfLastIteration.put(atom, newFeature);
@@ -203,7 +202,7 @@ public class Encoding2DECFPVariant extends Encoding2D {
 			}
 			for (final ECFPVariantFeature feature : newFeatures) {
 				if (feature != featureToCheck && featureToCheck.hasEqualSubstructure(feature)) {
-					if (featureToCheck.hashToInteger() >= feature.hashToInteger()) {
+					if (featureToCheck.hashCode() >= feature.hashCode()) {
 						iter.remove();
 						break;
 					}

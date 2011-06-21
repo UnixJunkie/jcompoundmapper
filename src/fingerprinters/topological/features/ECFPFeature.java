@@ -12,7 +12,7 @@ public class ECFPFeature implements IFeature {
 	
 	private IAtom coreAtom;
 	private int feature;
-	public IMolecule substructure;
+	private IMolecule substructure;
 	private int iterationNumber;
 	
 	public ECFPFeature(int feature, IAtom coreAtom, IMolecule substructure, int iterationNumber){
@@ -22,7 +22,8 @@ public class ECFPFeature implements IFeature {
 		this.iterationNumber=iterationNumber;
 	}
 	
-	public int hashToInteger() {
+	@Override
+	public int hashCode() {
 		return feature;
 	}
 
@@ -78,5 +79,19 @@ public class ECFPFeature implements IFeature {
 		return 1;
 	}
 
+	@Override
+	public Iterable<IAtom> representedAtoms() {
+		return substructure.atoms();
+	}
+
+	@Override
+	public Iterable<IBond> representedBonds() {
+		return substructure.bonds();
+	}
+	
+	
+	public IMolecule representedSubstructure(){
+		return this.substructure;
+	}
 }
 

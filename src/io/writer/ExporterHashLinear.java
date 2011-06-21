@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IBond;
 
 import tools.progressbar.ProgressBar;
 
@@ -111,7 +113,8 @@ public abstract class ExporterHashLinear extends ExporterLinear {
 		public double getValue() {
 			return 1;
 		}
-
+		
+		@Override
 		public int hashCode() {
 			return hash;
 		}
@@ -123,6 +126,18 @@ public abstract class ExporterHashLinear extends ExporterLinear {
 			if (arg0.hashCode() < hashCode())
 				return 1;
 			return 0;
+		}
+
+		@Override
+		public Iterable<IAtom> representedAtoms() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Iterable<IBond> representedBonds() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 	}
 }

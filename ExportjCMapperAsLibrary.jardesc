@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
 <jardesc>
     <jar path="c:/temp/jCMapper1.0.jar"/>
-    <options buildIfNeeded="true" compress="true" descriptionLocation="/FPGold/ExportjCMapperAsLibrary.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/jCMapper/ExportjCMapperAsLibrary.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
     <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
@@ -11,8 +11,8 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <javaElement handleIdentifier="=FPGold/src"/>
-        <file path="/FPGold/resources/CATS2D-SMARTS-DEFINITIONS"/>
-        <file path="/FPGold/ExportjCMapperAsLibrary.jardesc"/>
+        <javaElement handleIdentifier="=jCMapper/src"/>
+        <file path="/jCMapper/ExportjCMapperAsLibrary.jardesc"/>
+        <file path="/jCMapper/resources/CATS2D-SMARTS-DEFINITIONS"/>
     </selectedElements>
 </jardesc>

@@ -18,7 +18,9 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IMolecule;
 
+import tools.moltyping.ExtendedAtomAndBondTyper;
 import tools.moltyping.MoltyperException;
+import tools.moltyping.enumerations.EnumerationsAtomTypes.AtomLabelType;
 import fingerprinters.FingerPrinterException;
 import fingerprinters.features.IFeature;
 import fingerprinters.topological.features.ECFPFeature;
@@ -28,6 +30,10 @@ public class Encoding2DECFP extends Encoding2D {
 	private ArrayList<IFeature> completeFeatures;
 	private IAtomContainer molecule;
 	private Map<IAtom,ECFPFeature> featuresOfLastIteration;
+	
+	public Encoding2DECFP(){
+		this.setAtomLabelType(AtomLabelType.DAYLIGHT_INVARIANT_RING);
+	}
 	
 	@Override
 	public ArrayList<IFeature> getFingerprint(IAtomContainer molecule){

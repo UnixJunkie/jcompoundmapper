@@ -1,11 +1,15 @@
 package fingerprinters.topological.features;
 
+import java.util.ArrayList;
+
 import org.openscience.cdk.Molecule;
+import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.smiles.SmilesGenerator;
 
+import fingerprinters.FingerPrinterException;
 import fingerprinters.features.IFeature;
 
 public class ECFPFeature implements IFeature {
@@ -41,8 +45,46 @@ public class ECFPFeature implements IFeature {
 	@Override
 	public String featureToString() {
 		String smile;
-		smile = new SmilesGenerator().createSMILES(substructure);
+		ArrayList<DanglingBond> danglingBonds = this.detectDanglingBonds();
+		
+		IAtom[] tempAtoms = new IAtom[danglingBonds.size()];
+		final IMolecule substructureClone = this.getNonDeepCloneOfSubstructure();
+		
+		for (int i = 0; i < danglingBonds.size(); i++) {
+			final DanglingBond dangling = danglingBonds.get(i);
+			final IBond bond = dangling.getBond();
+			tempAtoms[i] = dangling.getConnectedAtom();
+			final IAtom pseudoAtom = new PseudoAtom();
+			bond.setAtom(pseudoAtom, dangling.getConnectedAtomPosition());
+			substructureClone.addAtom(pseudoAtom);
+			substructureClone.addBond(dangling.getBond());
+		}
+		
+		smile = new SmilesGenerator().createSMILES(substructureClone);
+
+		for (int i = 0; i < danglingBonds.size(); i++) {
+			final DanglingBond connectivity = danglingBonds.get(i);
+			final IBond bond = connectivity.getBond();
+			bond.setAtom(tempAtoms[i], connectivity.getConnectedAtomPosition());
+		}
 		return smile;
+	}
+	
+	private ArrayList<DanglingBond> detectDanglingBonds(){
+		ArrayList<DanglingBond> danglingBonds = new ArrayList<DanglingBond>();
+		try{
+			for(IBond bond: substructure.bonds()){
+				if(!substructure.contains(bond.getAtom(0))){
+					danglingBonds.add(new DanglingBond(bond, bond.getAtom(0)));
+					continue;
+				}if(!substructure.contains(bond.getAtom(1)))
+					danglingBonds.add(new DanglingBond(bond, bond.getAtom(1)));
+			}
+		}catch(FingerPrinterException e){
+			e.printStackTrace();
+			return null;
+		}
+		return danglingBonds;
 	}
 	
 	public IAtom getCoreAtom(){

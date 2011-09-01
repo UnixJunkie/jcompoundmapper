@@ -16,12 +16,14 @@ public class ExporterFactory {
 			return new ExporterBenchmark();
 		} else if (type == ExporterType.WEKA_NOMINAL) {
 			return new ExporterSparseNominalWeka();
+		} else if (type == ExporterType.SQLITE) {
+			return new ExporterSQLite();
 		}
 		return new ExporterLIBSVMSparse();
 	}
 
 	public static enum ExporterType {
-		LIBSVM_SPARSE, LIBSVM_MATRIX, FULL_CSV, STRING_PATTERNS, WEKA_HASHED, WEKA_NOMINAL, BENCHMARKS;
+		LIBSVM_SPARSE, LIBSVM_MATRIX, FULL_CSV, STRING_PATTERNS, WEKA_HASHED, WEKA_NOMINAL, BENCHMARKS, SQLITE;
 	}
 
 	public static ExporterType getExporterType(int index) {
@@ -39,6 +41,8 @@ public class ExporterFactory {
 			return ExporterType.WEKA_HASHED;
 		}else if (index == ExporterType.WEKA_NOMINAL.ordinal()) {
 			return ExporterType.WEKA_NOMINAL;
+		}else if (index == ExporterType.SQLITE.ordinal()) {
+			return ExporterType.SQLITE;
 		}
 		return ExporterType.LIBSVM_SPARSE;
 	}

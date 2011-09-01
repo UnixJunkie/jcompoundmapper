@@ -4,7 +4,9 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import tools.moltyping.enumerations.EnumerationsAtomTypes.AtomLabelType;
+import de.zbit.jcmapper.fingerprinters.geometrical.Encoding3DAtomPair;
+import de.zbit.jcmapper.tools.moltyping.enumerations.EnumerationsAtomTypes.AtomLabelType;
+
 import fingerprinters.SameMoleculeTester;
 
 public class AtomPair3DTest {

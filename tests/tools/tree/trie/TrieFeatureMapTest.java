@@ -1,27 +1,5 @@
 package tools.tree.trie;
 
-import fingerprinters.EncodingFingerprint;
-import fingerprinters.features.FeatureMap;
-import fingerprinters.geometrical.Encoding3DAtomPair;
-import fingerprinters.geometrical.Encoding3DAtomTriple;
-import fingerprinters.geometrical.Encoding3DCATS;
-import fingerprinters.geometrical.Encoding3D;
-import fingerprinters.geometrical.Encoding3DMolprint;
-import fingerprinters.geometrical.Encoding3DPharmacophore2Point;
-import fingerprinters.geometrical.Encoding3DPharmacophore3Point;
-import fingerprinters.topological.Encoding2DAllShortestPath;
-import fingerprinters.topological.Encoding2DAtomPair;
-import fingerprinters.topological.Encoding2DAtomTriple;
-import fingerprinters.topological.Encoding2DCATS;
-import fingerprinters.topological.DepthFirstSearch;
-import fingerprinters.topological.Encoding2DECFPVariant;
-import fingerprinters.topological.Encoding2D;
-import fingerprinters.topological.Encoding2DLocalAtomEnvironment;
-import fingerprinters.topological.Encoding2DMolprint;
-import fingerprinters.topological.Encoding2DPharmacophore2Point;
-import fingerprinters.topological.Encoding2DPharmacophore3Point;
-import fingerprinters.topological.Encoding2DSHEDKey;
-import io.reader.RandomAccessMDLReader;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -29,7 +7,31 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import tools.moltyping.enumerations.EnumerationsAtomTypes.AtomLabelType;
+import de.zbit.jcmapper.fingerprinters.EncodingFingerprint;
+import de.zbit.jcmapper.fingerprinters.features.FeatureMap;
+import de.zbit.jcmapper.fingerprinters.geometrical.Encoding3D;
+import de.zbit.jcmapper.fingerprinters.geometrical.Encoding3DAtomPair;
+import de.zbit.jcmapper.fingerprinters.geometrical.Encoding3DAtomTriple;
+import de.zbit.jcmapper.fingerprinters.geometrical.Encoding3DCATS;
+import de.zbit.jcmapper.fingerprinters.geometrical.Encoding3DMolprint;
+import de.zbit.jcmapper.fingerprinters.geometrical.Encoding3DPharmacophore2Point;
+import de.zbit.jcmapper.fingerprinters.geometrical.Encoding3DPharmacophore3Point;
+import de.zbit.jcmapper.fingerprinters.topological.DepthFirstSearch;
+import de.zbit.jcmapper.fingerprinters.topological.Encoding2D;
+import de.zbit.jcmapper.fingerprinters.topological.Encoding2DAllShortestPath;
+import de.zbit.jcmapper.fingerprinters.topological.Encoding2DAtomPair;
+import de.zbit.jcmapper.fingerprinters.topological.Encoding2DAtomTriple;
+import de.zbit.jcmapper.fingerprinters.topological.Encoding2DCATS;
+import de.zbit.jcmapper.fingerprinters.topological.Encoding2DECFPVariant;
+import de.zbit.jcmapper.fingerprinters.topological.Encoding2DLocalAtomEnvironment;
+import de.zbit.jcmapper.fingerprinters.topological.Encoding2DMolprint;
+import de.zbit.jcmapper.fingerprinters.topological.Encoding2DPharmacophore2Point;
+import de.zbit.jcmapper.fingerprinters.topological.Encoding2DPharmacophore3Point;
+import de.zbit.jcmapper.fingerprinters.topological.Encoding2DSHEDKey;
+import de.zbit.jcmapper.io.reader.RandomAccessMDLReader;
+import de.zbit.jcmapper.tools.moltyping.enumerations.EnumerationsAtomTypes.AtomLabelType;
+import de.zbit.jcmapper.tools.tree.trie.TrieFeatureMap;
+
 
 
 public class TrieFeatureMapTest {

@@ -3,6 +3,8 @@ package fingerprinters.topological;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.zbit.jcmapper.fingerprinters.topological.Encoding2DAllShortestPath;
+
 import fingerprinters.SameMoleculeTester;
 
 

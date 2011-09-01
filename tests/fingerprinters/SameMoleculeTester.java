@@ -1,6 +1,5 @@
 package fingerprinters;
 
-import io.reader.RandomAccessMDLReader;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,10 +8,13 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 
+import de.zbit.jcmapper.fingerprinters.EncodingFingerprint;
+import de.zbit.jcmapper.fingerprinters.features.FeatureMap;
+import de.zbit.jcmapper.fingerprinters.features.IFeature;
+import de.zbit.jcmapper.io.reader.RandomAccessMDLReader;
+
 import junit.framework.Assert;
 
-import fingerprinters.features.FeatureMap;
-import fingerprinters.features.IFeature;
 
 public class SameMoleculeTester {
 	

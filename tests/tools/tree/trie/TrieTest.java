@@ -2,9 +2,11 @@ package tools.tree.trie;
 
 import org.junit.Test;
 
-import tools.tree.trie.pattern.HashedPattern;
-import tools.tree.trie.pattern.Pattern;
-import tools.tree.trie.pattern.PatternContainer;
+import de.zbit.jcmapper.tools.tree.trie.Trie;
+import de.zbit.jcmapper.tools.tree.trie.pattern.HashedPattern;
+import de.zbit.jcmapper.tools.tree.trie.pattern.Pattern;
+import de.zbit.jcmapper.tools.tree.trie.pattern.PatternContainer;
+
 
 public class TrieTest {
 

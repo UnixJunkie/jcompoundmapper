@@ -50,15 +50,15 @@ public class ExporterSQLite implements IExporter {
 			db.exec("CREATE UNIQUE INDEX Index_"+tableDictionary+"_fp ON "+tableDictionary+"(fp);");
 			//fingerprint
 			db.exec("DROP TABLE IF EXISTS "+tableFingerprint);
-			db.exec("CREATE TABLE "+tableFingerprint+"(compoundid TEXT, fp INTEGER);");
+			db.exec("CREATE TABLE "+tableFingerprint+"(compoundnbr INTEGER, fp INTEGER);");
 			//compounds
 			db.exec("DROP TABLE IF EXISTS "+tableCompounds);
-			db.exec("CREATE TABLE "+tableCompounds+"(compoundid TEXT PRIMARY KEY);");
+			db.exec("CREATE TABLE "+tableCompounds+"(compoundid TEXT PRIMARY KEY, compoundnbr INTEGER);");
 			//fingerprint pivoted
 			if(createPivotedTable){
 				//just an initial table, the rest will be created dynamically
 				db.exec("DROP TABLE IF EXISTS "+tableFingerprintPivoted);
-				db.exec("CREATE TABLE "+tableFingerprintPivoted+"(compoundid TEXT PRIMARY KEY);");
+				db.exec("CREATE TABLE "+tableFingerprintPivoted+"(compoundnbr INTEGER PRIMARY KEY);");
 			}
 		}
 		catch (SQLiteException e) 
@@ -104,9 +104,9 @@ public class ExporterSQLite implements IExporter {
 			int lastUsedIndex = 0;
 			Collections.sort(Features);
 			try {
-				db.exec("INSERT INTO "+tableCompounds+"(compoundid) VALUES ('"+cmpdLabel+"');");
+				db.exec("INSERT INTO "+tableCompounds+"(compoundid,compoundnbr) VALUES ('"+cmpdLabel+"','"+i+"');");
 				if(createPivotedTable){
-					db.exec("INSERT INTO "+tableFingerprintPivoted+"(compoundid) VALUES ('"+cmpdLabel+"');");
+					db.exec("INSERT INTO "+tableFingerprintPivoted+"(compoundid,"+cmpdLabel+") VALUES ('"+cmpdLabel+"','"+i+"');");
 				}
 				db.exec("BEGIN;");
 			} 
@@ -157,7 +157,7 @@ public class ExporterSQLite implements IExporter {
 				}
 				//System.out.println("Details: encoding='"+featureString+"', fp='"+fpString+"'");
 				try {
-					db.exec("INSERT INTO "+tableFingerprint+"(compoundid, fp) VALUES ('"+cmpdLabel+"','"+fpInteger+"');");
+					db.exec("INSERT INTO "+tableFingerprint+"(compoundnbr, fp) VALUES ('"+i+"','"+fpInteger+"');");
 				} 
 				catch (SQLiteException e) 
 				{       
@@ -197,22 +197,22 @@ public class ExporterSQLite implements IExporter {
 				st=db.prepare("SELECT fp FROM "+tableDictionary);
 				while (st.step()) {
 					fpString=fpHead+st.columnString(0);
-					SQLiteStatement st2=db.prepare("SELECT compoundid FROM "+tableCompounds);
-					String cmpdId=null;
+					SQLiteStatement st2=db.prepare("SELECT compoundnbr FROM "+tableCompounds);
+					int cmpdNbr=-1;
 					while (st2.step()) {
-						cmpdId=st2.columnString(0);
-						db.exec("UPDATE "+tableFingerprintPivoted+" SET "+fpString+" = 0 WHERE compoundid='"+cmpdId+"'");
+						cmpdNbr=st2.columnInt(0);
+						db.exec("UPDATE "+tableFingerprintPivoted+" SET "+fpString+" = 0 WHERE compoundnbr='"+cmpdNbr+"'");
 					}
 				}
 				db.exec("COMMIT;");
 				//now set ON bits to '1' 
 				db.exec("BEGIN;");
 				st=db.prepare("SELECT compoundid, fp FROM "+tableFingerprint);
-				String cmpdId=null;
+				int cmpdNbr=-1;
 				while (st.step()) {
-					cmpdId=st.columnString(0);
+					cmpdNbr=st.columnInt(0);
 					fpString=fpHead+st.columnString(1);
-					db.exec("UPDATE "+tableFingerprintPivoted+" SET "+fpString+" = 1 WHERE compoundid='"+cmpdId+"'");
+					db.exec("UPDATE "+tableFingerprintPivoted+" SET "+fpString+" = 1 WHERE compoundnbr='"+cmpdNbr+"'");
 				}
 				db.exec("COMMIT;");
 			} 
@@ -227,8 +227,9 @@ public class ExporterSQLite implements IExporter {
 		System.out.println("Time elapsed: " + (end - start) + " ms");
 		System.out.println("Creating table indices");
 		try {
-			db.exec("CREATE INDEX Index_"+tableFingerprint+"_compoundid ON "+tableFingerprint+"(compoundid);");
+			db.exec("CREATE INDEX Index_"+tableFingerprint+"_compoundnbr ON "+tableFingerprint+"(compoundnbr);");
 			db.exec("CREATE INDEX Index_"+tableFingerprint+"_fp ON "+tableFingerprint+"(fp);");
+			db.exec("CREATE INDEX Index_"+tableCompounds+"_compoundnbr ON "+tableCompounds+"(compoundnbr);");
 		}
 		catch (SQLiteException e) 
 		{       

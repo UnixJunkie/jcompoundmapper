@@ -28,8 +28,10 @@ public class ExporterSQLite implements IExporter {
 	@Override
 	public void export(RandomAccessMDLReader reader, EncodingFingerprint fingerprinter, String label, File outputFile) {
 		// WARNING: This is extremely slow, so beware or try doing some parts in memory
-		// For now this scales to any size, since it operates fully on SQL queries, but
-		// this slows down things.
+		//          For now this scales to any size, since it operates fully on SQL queries, but
+		//          this slows down things.
+		// WARNING2: This does only work for a single execution, not for an export into an
+		//           already existing SQLite DB
 		final boolean createPivotedTable= false;
 		
 		final SQLiteConnection db = new SQLiteConnection(outputFile);
@@ -45,20 +47,20 @@ public class ExporterSQLite implements IExporter {
 		try {
 			db.open(true);
 			//dictionary
-			db.exec("DROP TABLE IF EXISTS "+tableDictionary);
-			db.exec("CREATE TABLE "+tableDictionary+"(encoding TEXT PRIMARY KEY, fp INTEGER);");
-			db.exec("CREATE UNIQUE INDEX Index_"+tableDictionary+"_fp ON "+tableDictionary+"(fp);");
+			//db.exec("DROP TABLE IF EXISTS "+tableDictionary);
+			db.exec("CREATE TABLE IF NOT EXISTS "+tableDictionary+"(encoding TEXT PRIMARY KEY, fp INTEGER);");
+			db.exec("CREATE UNIQUE INDEX IF NOT EXISTS Index_"+tableDictionary+"_fp ON "+tableDictionary+"(fp);");
 			//fingerprint
-			db.exec("DROP TABLE IF EXISTS "+tableFingerprint);
-			db.exec("CREATE TABLE "+tableFingerprint+"(compoundnbr INTEGER, fp INTEGER);");
+			//db.exec("DROP TABLE IF EXISTS "+tableFingerprint);
+			db.exec("CREATE TABLE IF NOT EXISTS "+tableFingerprint+"(compoundnbr INTEGER, fp INTEGER);");
 			//compounds
-			db.exec("DROP TABLE IF EXISTS "+tableCompounds);
-			db.exec("CREATE TABLE "+tableCompounds+"(compoundid TEXT PRIMARY KEY, compoundnbr INTEGER);");
+			//db.exec("DROP TABLE IF EXISTS "+tableCompounds);
+			db.exec("CREATE TABLE IF NOT EXISTS "+tableCompounds+"(compoundid TEXT PRIMARY KEY, compoundnbr INTEGER);");
 			//fingerprint pivoted
 			if(createPivotedTable){
 				//just an initial table, the rest will be created dynamically
-				db.exec("DROP TABLE IF EXISTS "+tableFingerprintPivoted);
-				db.exec("CREATE TABLE "+tableFingerprintPivoted+"(compoundnbr INTEGER PRIMARY KEY);");
+				//db.exec("DROP TABLE IF EXISTS "+tableFingerprintPivoted);
+				db.exec("CREATE TABLE IF NOT EXISTS "+tableFingerprintPivoted+"(compoundnbr INTEGER PRIMARY KEY);");
 			}
 		}
 		catch (SQLiteException e) 
@@ -78,6 +80,37 @@ public class ExporterSQLite implements IExporter {
 		System.out.println("Encoding molecules");
 		ProgressBar progressBar = new ProgressBar(reader.getSize());
 		int fpCounter=1;
+		SQLiteStatement st = null;
+		try {
+			//re-assign fpString to a matching one created previously 
+			st=db.prepare("SELECT MAX(fp) FROM "+tableDictionary);
+			while (st.step()) {
+				fpCounter=st.columnInt(0);
+				fpCounter=fpCounter+1;
+			}
+		} 
+		catch (SQLiteException e2) 
+		{       
+			//System.out.println(e2);
+			fpCounter=1;
+		}
+
+		int cmpdCounter=1;
+		try {
+			//re-assign fpString to a matching one created previously 
+			st=db.prepare("SELECT MAX(compoundnbr) FROM "+tableCompounds);
+			while (st.step()) {
+				cmpdCounter=st.columnInt(0);
+				cmpdCounter=cmpdCounter+1;
+			}
+		} 
+		catch (SQLiteException e2) 
+		{       
+			//System.out.println(e2);
+			cmpdCounter=1;
+		}
+
+		
 		for (int i = 0; i < reader.getSize(); i++) {
 			IAtomContainer mol = reader.getMol(i);
 			FeatureMap featureMap = new FeatureMap(fingerprinter.getFingerprint(mol));
@@ -85,7 +118,7 @@ public class ExporterSQLite implements IExporter {
 			if (molLabel != null) {
 				featureMap.setLabel(molLabel);
 			} else {
-				featureMap.setLabel(ExporterHelper.getMolName(mol) + "_INDEX=" + i);
+				featureMap.setLabel(ExporterHelper.getMolName(mol) + "_INDEX=" + cmpdCounter);
 			}
 
 			//IFeature[] keys = (IFeature[]) featureMap.getKeySet().toArray();
@@ -104,15 +137,35 @@ public class ExporterSQLite implements IExporter {
 			int lastUsedIndex = 0;
 			Collections.sort(Features);
 			try {
-				db.exec("INSERT INTO "+tableCompounds+"(compoundid,compoundnbr) VALUES ('"+cmpdLabel+"','"+i+"');");
+				db.exec("INSERT INTO "+tableCompounds+"(compoundid,compoundnbr) VALUES ('"+cmpdLabel+"','"+cmpdCounter+"');");
 				if(createPivotedTable){
-					db.exec("INSERT INTO "+tableFingerprintPivoted+"(compoundid,"+cmpdLabel+") VALUES ('"+cmpdLabel+"','"+i+"');");
+					db.exec("INSERT INTO "+tableFingerprintPivoted+"(compoundid,"+cmpdLabel+") VALUES ('"+cmpdLabel+"','"+cmpdCounter+"');");
 				}
 				db.exec("BEGIN;");
 			} 
 			catch (SQLiteException e) 
-			{       
-				System.out.println(e);
+			{   
+				// compound exists, but for which fingerprint routine?
+				try {
+					st=db.prepare("SELECT compoundnbr FROM "+tableCompounds+" WHERE compoundid = ?");
+					st.bind(1, cmpdLabel);
+					int cmpdCounter2use=-1;
+					while (st.step()) {
+						cmpdCounter2use=st.columnInt(0);
+					}
+					st=db.prepare("SELECT compoundnbr FROM "+tableFingerprint+" WHERE compoundnbr = ?");
+					st.bind(1, cmpdCounter2use);
+					while (st.step()) {
+						cmpdCounter2use=st.columnInt(0);
+					}
+					System.out.println("Compound exists already, skipping "+fingerprinterName+" calculation for '"+cmpdLabel+"' ("+cmpdCounter2use+")");
+					continue;
+					//skip this calculation routine and do not add anything to the DB
+				} 
+				catch (SQLiteException e2) 
+				{       
+					//All fine compound does not encode this fingerprint
+				}
 			}
 			String currentFeatureString=null;
 			String previousFeatureString=null;
@@ -140,7 +193,6 @@ public class ExporterSQLite implements IExporter {
 				catch (SQLiteException e) 
 				{       
 					// skipping duplicates
-					SQLiteStatement st = null;
 					try {
 						//re-assign fpString to a matching one created previously 
 						st=db.prepare("SELECT fp FROM "+tableDictionary+" WHERE encoding = ?");
@@ -157,7 +209,7 @@ public class ExporterSQLite implements IExporter {
 				}
 				//System.out.println("Details: encoding='"+featureString+"', fp='"+fpString+"'");
 				try {
-					db.exec("INSERT INTO "+tableFingerprint+"(compoundnbr, fp) VALUES ('"+i+"','"+fpInteger+"');");
+					db.exec("INSERT INTO "+tableFingerprint+"(compoundnbr, fp) VALUES ('"+cmpdCounter+"','"+fpInteger+"');");
 				} 
 				catch (SQLiteException e) 
 				{       
@@ -174,6 +226,8 @@ public class ExporterSQLite implements IExporter {
 				System.out.println(e);
 			}
 			progressBar.DisplayBar();
+			
+			cmpdCounter=cmpdCounter+1;
 		}
 
 		Long end = null;
@@ -185,7 +239,7 @@ public class ExporterSQLite implements IExporter {
 			System.out.println("Creating fingerprint pivot table");
 			try {
 				//get all fingerprints, add columns to the pivot table, and initialize them with '0' 
-				SQLiteStatement st=db.prepare("SELECT fp FROM "+tableDictionary);
+				st=db.prepare("SELECT fp FROM "+tableDictionary);
 				String fpString=null;
 				String fpHead="fp";
 				while (st.step()) {
@@ -227,9 +281,9 @@ public class ExporterSQLite implements IExporter {
 		System.out.println("Time elapsed: " + (end - start) + " ms");
 		System.out.println("Creating table indices");
 		try {
-			db.exec("CREATE INDEX Index_"+tableFingerprint+"_compoundnbr ON "+tableFingerprint+"(compoundnbr);");
-			db.exec("CREATE INDEX Index_"+tableFingerprint+"_fp ON "+tableFingerprint+"(fp);");
-			db.exec("CREATE INDEX Index_"+tableCompounds+"_compoundnbr ON "+tableCompounds+"(compoundnbr);");
+			db.exec("CREATE INDEX IF NOT EXISTS Index_"+tableFingerprint+"_compoundnbr ON "+tableFingerprint+"(compoundnbr);");
+			db.exec("CREATE INDEX IF NOT EXISTS Index_"+tableFingerprint+"_fp ON "+tableFingerprint+"(fp);");
+			db.exec("CREATE INDEX IF NOT EXISTS Index_"+tableCompounds+"_compoundnbr ON "+tableCompounds+"(compoundnbr);");
 		}
 		catch (SQLiteException e) 
 		{       

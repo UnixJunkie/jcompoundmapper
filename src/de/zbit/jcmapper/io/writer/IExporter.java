@@ -7,5 +7,5 @@ import de.zbit.jcmapper.fingerprinters.EncodingFingerprint;
 import de.zbit.jcmapper.io.reader.RandomAccessMDLReader;
 
 public interface IExporter {
-	public void export(RandomAccessMDLReader reader, EncodingFingerprint fingerprinter, String label, File outputFile);
+	public void export(RandomAccessMDLReader reader, EncodingFingerprint fingerprinter, String label, File outputFile, boolean useAromaticFlag);
 }

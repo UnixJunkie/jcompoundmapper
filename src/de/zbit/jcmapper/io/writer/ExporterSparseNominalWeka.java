@@ -68,19 +68,19 @@ public class ExporterSparseNominalWeka implements IExporter {
 	/*
 	 * write a ARFF header
 	 */
-	private void writeHeader(TreeMap<IFeature, Integer> map, FileWriter fw, RandomAccessMDLReader reader, String label) throws IOException {
+	private void writeHeader(TreeMap<IFeature, Integer> map, FileWriter fw, RandomAccessMDLReader reader, String label, boolean useAromaticFlag) throws IOException {
 		Set<IFeature> keys = map.keySet();
 		fw.append("@relation	MOLECULE\n");
 		Iterator<IFeature> iter = keys.iterator();
 		while (iter.hasNext()) {
-			fw.append("@ATTRIBUTE\t+" + iter.next().featureToString() + "\t{0,1}\n");
+			fw.append("@ATTRIBUTE\t+" + iter.next().featureToString(useAromaticFlag) + "\t{0,1}\n");
 		}
 		fw.append("@ATTRIBUTE "+ getLabels(label, reader));
 		fw.append("@DATA\n");
 	}
 
 	@Override
-	public void export(RandomAccessMDLReader reader, EncodingFingerprint fingerprinter, String label, File outputFile) {
+	public void export(RandomAccessMDLReader reader, EncodingFingerprint fingerprinter, String label, File outputFile, boolean useAromaticFlag) {
 
 		int collisions = 0;
 
@@ -92,7 +92,7 @@ public class ExporterSparseNominalWeka implements IExporter {
 		try {
 			final FileWriter fw = new FileWriter(outputFile);
 			TreeMap<IFeature, Integer> globalFeatureHashMap = collectGlobalFeatures(reader, fingerprinter);
-			writeHeader(globalFeatureHashMap, fw, reader, label);
+			writeHeader(globalFeatureHashMap, fw, reader, label, useAromaticFlag);
 
 			for (int i = 0; i < reader.getSize(); i++) {
 				IAtomContainer mol = reader.getMol(i);
@@ -108,7 +108,7 @@ public class ExporterSparseNominalWeka implements IExporter {
 				Set<IFeature> keys = featureMap.getKeySet();
 				for (IFeature feature : keys) {
 					if (feature instanceof IFeature) {
-						Features.add(new SortableFeature(feature));
+						Features.add(new SortableFeature(feature,useAromaticFlag));
 					}
 				}
 

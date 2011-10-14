@@ -27,7 +27,7 @@ public class NumericStringFeature implements IFeature {
 	}
 
 	@Override
-	public String featureToString() {
+	public String featureToString(boolean useAromaticFlag) {
 		return this.feature;
 	}
 

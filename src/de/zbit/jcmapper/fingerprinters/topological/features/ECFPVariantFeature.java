@@ -19,7 +19,7 @@ public class ECFPVariantFeature extends ECFPFeature {
 	}
 
 	@Override
-	public String featureToString() {
+	public String featureToString(boolean useAromaticFlag) {
 		final IAtom[] tempAtoms = new IAtom[this.connectivityBonds.length];
 		final IMolecule substructureClone = this.getNonDeepCloneOfSubstructure();
 
@@ -34,7 +34,7 @@ public class ECFPVariantFeature extends ECFPFeature {
 			}
 			substructureClone.addBond(connectivity.getBond());
 		}
-		String smile = new SmilesGenerator().createSMILES(substructureClone);
+		String smile = new SmilesGenerator(useAromaticFlag).createSMILES(substructureClone);
 
 		for (int i = 0; i < this.connectivityBonds.length; i++) {
 			final DanglingBond connectivity = this.connectivityBonds[i];

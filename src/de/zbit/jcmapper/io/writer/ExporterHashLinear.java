@@ -49,7 +49,7 @@ public abstract class ExporterHashLinear extends ExporterLinear {
 	protected abstract int writeFingerprint(ArrayList<IFeature> fingerprint, FileWriter fw, String label);
 
 	@Override
-	public void export(RandomAccessMDLReader reader, EncodingFingerprint fingerprinter, String label, File outputFile) {
+	public void export(RandomAccessMDLReader reader, EncodingFingerprint fingerprinter, String label, File outputFile, boolean useAromaticFlag) {
 		
 		try {
 			
@@ -106,7 +106,7 @@ public abstract class ExporterHashLinear extends ExporterLinear {
 		}
 
 		@Override
-		public String featureToString() {
+		public String featureToString(boolean useAromaticFlag) {
 			return ("" + hash);
 		}
 

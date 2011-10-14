@@ -44,7 +44,7 @@ public class ECFPFeature implements IFeature {
 	}
 
 	@Override
-	public String featureToString() {
+	public String featureToString(boolean useAromaticFlag) {
 		String smile;
 		ArrayList<DanglingBond> danglingBonds = this.detectDanglingBonds();
 		
@@ -61,7 +61,7 @@ public class ECFPFeature implements IFeature {
 			substructureClone.addBond(dangling.getBond());
 		}
 		
-		smile = new SmilesGenerator().createSMILES(substructureClone);
+		smile = new SmilesGenerator(useAromaticFlag).createSMILES(substructureClone);
 
 		for (int i = 0; i < danglingBonds.size(); i++) {
 			final DanglingBond connectivity = danglingBonds.get(i);

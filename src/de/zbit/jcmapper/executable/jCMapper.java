@@ -41,6 +41,7 @@ public class jCMapper {
 	private ExporterType exporterType = ExporterType.LIBSVM_SPARSE;
 	private DistanceType distanceType = DistanceType.TANIMOTO;
 	private int hashSpaceSize = (int) Math.pow(2, 18);
+	private boolean useAromaticityFlag=false;
 
 	/**
 	 * @param args
@@ -103,14 +104,14 @@ public class jCMapper {
 			if (!(ExporterType.BENCHMARKS == exporterType))
 				System.out.println("Output file = " + fOut.getAbsolutePath());
 
-			exporter.export(reader, fingerprintEncoding, sdTagForLabel, fOut);
+			exporter.export(reader, fingerprintEncoding, sdTagForLabel, fOut,useAromaticityFlag);
 		} else {
 			try {
 				File fOut = new File(outFile);
 				if (!(ExporterType.BENCHMARKS == exporterType))
 					System.out.println("Output file = " + fOut.getAbsolutePath());
 
-				exporter.export(reader, fingerprintEncoding, sdTagForLabel, fOut);
+				exporter.export(reader, fingerprintEncoding, sdTagForLabel, fOut,useAromaticityFlag);
 			} catch (Exception e) {
 				System.out.println("File " + outFile + " could not be created.");
 				System.exit(1);
@@ -134,6 +135,7 @@ public class jCMapper {
 		}
 		System.out.println("Labeling Algorithm: " + fingerprintEncoding.getAtomLabelType());
 		System.out.println("Export option: " + exporterType);
+		System.out.println("Use aromaticity flag: " + useAromaticityFlag);
 		if (exporterType == ExporterType.LIBSVM_MATRIX)
 			System.out.println("Similarity measure: " + distanceType);
 		
@@ -174,6 +176,8 @@ public class jCMapper {
 				"Hash space size (default=2^18)").create("hs"));
 		final Option optFormat = (OptionBuilder.isRequired(false).hasArg(true).withDescription(
 				"Output format: " + listEnumerationOption(ExporterType.values())).create("ff"));
+		final Option optAromFlag = (OptionBuilder.isRequired(false).withDescription("Use aromaticity flag (only relevant for STRING_PATTERNS,SQLITE,WEKA_NOMINAL)").hasArg(false)
+				.create("k"));
 
 		options.addOption(optSDF);
 		options.addOption(optLabel);
@@ -186,6 +190,7 @@ public class jCMapper {
 		options.addOption(optDistanceMeasure);
 		options.addOption(optStretchingFactor);
 		options.addOption(optHashSpace);
+		options.addOption(optAromFlag);
 		return options.addOption(optHelprinter);
 	}
 	
@@ -227,6 +232,9 @@ public class jCMapper {
 				} catch (Exception e) {
 					throw new ParseException("Error parsing name of encoding type. Please check your input.");
 				}
+			}
+			if (lvCmd.hasOption("k")) {
+				useAromaticityFlag=true;
 			}
 			if (lvCmd.hasOption("f")) {
 				sdFileInputData = new String(lvCmd.getOptionValue("f"));

@@ -32,7 +32,7 @@ public class ExporterLIBSVMMatrix implements IExporter {
 	}
 
 	@Override
-	public void export(RandomAccessMDLReader reader, EncodingFingerprint fingerprinter, String label, File outputFile) {
+	public void export(RandomAccessMDLReader reader, EncodingFingerprint fingerprinter, String label, File outputFile, boolean useAromaticFlag) {
 		Long start = System.currentTimeMillis();
 		ArrayList<FeatureMap> featuremaps = new ArrayList<FeatureMap>();
 		

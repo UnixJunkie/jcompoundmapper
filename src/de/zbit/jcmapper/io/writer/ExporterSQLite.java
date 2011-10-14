@@ -26,7 +26,7 @@ import de.zbit.jcmapper.tools.progressbar.ProgressBar;
 public class ExporterSQLite implements IExporter {
  
 	@Override
-	public void export(RandomAccessMDLReader reader, EncodingFingerprint fingerprinter, String label, File outputFile) {
+	public void export(RandomAccessMDLReader reader, EncodingFingerprint fingerprinter, String label, File outputFile, boolean useAromaticFlag) {
 		// WARNING: This is extremely slow, so beware or try doing some parts in memory
 		//          For now this scales to any size, since it operates fully on SQL queries, but
 		//          this slows down things.
@@ -127,7 +127,7 @@ public class ExporterSQLite implements IExporter {
 
 			for (IFeature feature : keys) {
 				if (feature instanceof IFeature) {
-					Features.add(new SortableFeature(feature));
+					Features.add(new SortableFeature(feature, useAromaticFlag));
 				}
 			}
 
@@ -175,7 +175,7 @@ public class ExporterSQLite implements IExporter {
 					continue;
 				}
 				fpInteger=fpCounter;
-				featureString=feature.getString() + ":" + df.format(feature.getValue());
+				featureString=feature.getString(useAromaticFlag) + ":" + df.format(feature.getValue());
 				//skip processing redundant features, aka do not count them up
 				currentFeatureString=featureString;
 				if(previousFeatureString!=null && currentFeatureString!=null) {

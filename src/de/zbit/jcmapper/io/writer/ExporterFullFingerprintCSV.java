@@ -43,7 +43,7 @@ public class ExporterFullFingerprintCSV implements IExporter {
 	}
 
 	@Override
-	public void export(RandomAccessMDLReader reader, EncodingFingerprint fingerprinter, String label, File outputFile) {
+	public void export(RandomAccessMDLReader reader, EncodingFingerprint fingerprinter, String label, File outputFile, boolean useAromaticFlag) {
 
 		try {
 			final FileWriter fw = new FileWriter(outputFile);

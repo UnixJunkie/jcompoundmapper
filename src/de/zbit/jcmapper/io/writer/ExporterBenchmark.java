@@ -17,7 +17,7 @@ import de.zbit.jcmapper.io.reader.RandomAccessMDLReader;
 public class ExporterBenchmark implements IExporter {
 
 	@Override
-	public void export(RandomAccessMDLReader reader, EncodingFingerprint fingerprinter, String label, File outputFile) {
+	public void export(RandomAccessMDLReader reader, EncodingFingerprint fingerprinter, String label, File outputFile, boolean useAromaticFlag) {
 		DecimalFormat df = new DecimalFormat();
 		double[] features = new double[reader.getSize()];
 		

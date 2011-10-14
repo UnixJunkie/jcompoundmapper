@@ -23,7 +23,7 @@ import de.zbit.jcmapper.tools.progressbar.ProgressBar;
 public class ExporterSparseString implements IExporter {
  
 	@Override
-	public void export(RandomAccessMDLReader reader, EncodingFingerprint fingerprinter, String label, File outputFile) {
+	public void export(RandomAccessMDLReader reader, EncodingFingerprint fingerprinter, String label, File outputFile, boolean useAromaticFlag) {
 
 		try {
 			final FileWriter fw = new FileWriter(outputFile);
@@ -50,7 +50,7 @@ public class ExporterSparseString implements IExporter {
 
 				for (IFeature feature : keys) {
 					if (feature instanceof IFeature) {
-						Features.add(new SortableFeature(feature));
+						Features.add(new SortableFeature(feature,useAromaticFlag));
 					}
 				}
 
@@ -62,7 +62,7 @@ public class ExporterSparseString implements IExporter {
 						collisions++;
 						continue;
 					}
-					fw.append("\t" + feature.getString() + ":" + df.format(feature.getValue()));
+					fw.append("\t" + feature.getString(useAromaticFlag) + ":" + df.format(feature.getValue()));
 					lastUsedIndex = feature.getHash();
 				}
 				fw.append("\n");

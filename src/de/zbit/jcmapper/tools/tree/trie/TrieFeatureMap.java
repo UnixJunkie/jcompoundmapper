@@ -20,7 +20,7 @@ public class TrieFeatureMap extends Trie {
 		
 		 for(IFeature feature: featuresKeys){
 			 double count = fmap.getValue(feature);
-			 PatternContainer pc = getPattern4String(feature.featureToString());
+			 PatternContainer pc = getPattern4String(feature.featureToString(false));
 			 pc.setCount((int) count);
 			 pc.setNumericValue(count);
 			 this.insertPattern(pc);

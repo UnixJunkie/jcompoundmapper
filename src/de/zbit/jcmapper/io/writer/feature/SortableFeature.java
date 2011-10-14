@@ -6,9 +6,9 @@ public class SortableFeature implements Comparable<SortableFeature> {
 	final IFeature pattern;
 	final int hash;
 
-	public SortableFeature(IFeature feature) {
+	public SortableFeature(IFeature feature, boolean useAromaticityFlag) {
 		this.pattern = feature;
-		this.hash = feature.featureToString().hashCode();
+		this.hash = feature.featureToString(useAromaticityFlag).hashCode();
 	}
 
 	public int getHash() {
@@ -19,8 +19,8 @@ public class SortableFeature implements Comparable<SortableFeature> {
 		return pattern.getValue();
 	}
 
-	public String getString() {
-		return this.pattern.featureToString();
+	public String getString(boolean useAromaticityFlag) {
+		return this.pattern.featureToString(useAromaticityFlag);
 	}
 
 	@Override

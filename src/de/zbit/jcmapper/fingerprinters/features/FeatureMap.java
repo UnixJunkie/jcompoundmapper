@@ -120,14 +120,14 @@ public class FeatureMap {
 		return this.featureMap.get(key);
 	}
 
-	public void print() {
+	public void print(boolean useAromaticFlag) {
 		DecimalFormat df = new DecimalFormat();
 		System.out.print("label=" + this.label + "\t");
 		final Set<IFeature> features = this.featureMap.keySet();
 		ArrayList<IFeature> list = new ArrayList<IFeature>(features);
 		Collections.sort(list);
 		for (final IFeature feature : list) {
-			System.out.print("\t" + feature.featureToString() + " " + df.format(this.featureMap.get(feature)));
+			System.out.print("\t" + feature.featureToString(useAromaticFlag) + " " + df.format(this.featureMap.get(feature)));
 		}
 		System.out.println("");
 	}

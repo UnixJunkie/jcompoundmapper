@@ -5,7 +5,7 @@ import org.openscience.cdk.interfaces.IBond;
 
 public interface IFeature extends Comparable<IFeature>{
 
-	public abstract String featureToString();
+	public abstract String featureToString(boolean useAromaticFlag);
 
 	public abstract double getValue();
 	

@@ -19,6 +19,10 @@ public class SortableFeature implements Comparable<SortableFeature> {
 		return pattern.getValue();
 	}
 
+	public IFeature getFeature() {
+		return pattern;
+	}
+	
 	public String getString(boolean useAromaticityFlag) {
 		return this.pattern.featureToString(useAromaticityFlag);
 	}

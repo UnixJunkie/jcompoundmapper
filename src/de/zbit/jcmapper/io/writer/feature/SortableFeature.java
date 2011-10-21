@@ -5,10 +5,12 @@ import de.zbit.jcmapper.fingerprinters.features.IFeature;
 public class SortableFeature implements Comparable<SortableFeature> {
 	final IFeature pattern;
 	final int hash;
+	final boolean useAromaticityFlag;
 
 	public SortableFeature(IFeature feature, boolean useAromaticityFlag) {
 		this.pattern = feature;
 		this.hash = feature.featureToString(useAromaticityFlag).hashCode();
+		this.useAromaticityFlag=useAromaticityFlag;
 	}
 
 	public int getHash() {
@@ -23,6 +25,10 @@ public class SortableFeature implements Comparable<SortableFeature> {
 		return pattern;
 	}
 	
+	public String getString() {
+		return this.pattern.featureToString(useAromaticityFlag);
+	}
+
 	public String getString(boolean useAromaticityFlag) {
 		return this.pattern.featureToString(useAromaticityFlag);
 	}

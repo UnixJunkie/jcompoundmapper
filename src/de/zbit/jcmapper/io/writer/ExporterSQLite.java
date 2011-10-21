@@ -8,6 +8,7 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Set;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -33,6 +34,9 @@ public class ExporterSQLite implements IExporter {
 		// WARNING2: This does only work for a single execution, not for an export into an
 		//           already existing SQLite DB
 		final boolean createPivotedTable= false;
+
+		// Store only unique String representations 
+		final boolean storeOnlyUniqueStrings=true;
 		
 		final SQLiteConnection db = new SQLiteConnection(outputFile);
 		//avoid special characters in table name
@@ -124,12 +128,24 @@ public class ExporterSQLite implements IExporter {
 			//IFeature[] keys = (IFeature[]) featureMap.getKeySet().toArray();
 			Set<IFeature> keys =   featureMap.getKeySet();
 			ArrayList<SortableFeature> Features = new ArrayList<SortableFeature>();
-
+			SortableFeature sftemp=null;
+			HashMap<String, Integer> keyStrings = new HashMap<String, Integer>();
 			for (IFeature feature : keys) {
 				if (feature instanceof IFeature) {
-					Features.add(new SortableFeature(feature, useAromaticFlag));
+					sftemp=new SortableFeature(feature, useAromaticFlag);
+					if(storeOnlyUniqueStrings){
+						String keyString=sftemp.getString();
+						if(!keyStrings.containsKey(keyString)) {
+							Features.add(sftemp);
+							keyStrings.put(keyString,new Integer(1));
+						}
+					}
+					else{
+						Features.add(sftemp);
+					}
 				}
 			}
+			keyStrings=null;
 
 			String cmpdLabel=featureMap.getLabel();
 			String featureString=null;

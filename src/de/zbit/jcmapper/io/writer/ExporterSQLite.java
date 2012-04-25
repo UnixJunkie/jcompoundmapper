@@ -1,18 +1,23 @@
 /*
- * Author: Joerg Kurt Wegner, me@joergkurtwegner.eu
- * 2011-08
+ * Author: Joerg Kurt Wegner (JKW), me@joergkurtwegner.eu
+ * Copyright JKW, 2012. All rights reserved.
+ * 2011-12-14
  */
 package de.zbit.jcmapper.io.writer;
 
 import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.openscience.cdk.AtomContainer;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-
+import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.qsar.descriptors.molecular.BCUTDescriptor;
+import org.openscience.cdk.qsar.result.DoubleArrayResult;
 import com.almworks.sqlite4java.SQLiteConnection;
 import com.almworks.sqlite4java.SQLiteException;
 import com.almworks.sqlite4java.SQLiteStatement;
@@ -23,9 +28,10 @@ import de.zbit.jcmapper.fingerprinters.features.IFeature;
 import de.zbit.jcmapper.io.reader.RandomAccessMDLReader;
 import de.zbit.jcmapper.io.writer.feature.SortableFeature;
 import de.zbit.jcmapper.tools.progressbar.ProgressBar;
+import de.zbit.jcmapper.fingerprinters.topological.features.ECFPFeature;
 
 public class ExporterSQLite implements IExporter {
- 
+
 	@Override
 	public void export(RandomAccessMDLReader reader, EncodingFingerprint fingerprinter, String label, File outputFile, boolean useAromaticFlag) {
 		// WARNING: This is extremely slow, so beware or try doing some parts in memory
@@ -34,9 +40,6 @@ public class ExporterSQLite implements IExporter {
 		// WARNING2: This does only work for a single execution, not for an export into an
 		//           already existing SQLite DB
 		final boolean createPivotedTable= false;
-
-		// Store only unique String representations 
-		final boolean storeOnlyUniqueStrings=true;
 		
 		final SQLiteConnection db = new SQLiteConnection(outputFile);
 		//avoid special characters in table name
@@ -52,7 +55,7 @@ public class ExporterSQLite implements IExporter {
 			db.open(true);
 			//dictionary
 			//db.exec("DROP TABLE IF EXISTS "+tableDictionary);
-			db.exec("CREATE TABLE IF NOT EXISTS "+tableDictionary+"(encoding TEXT PRIMARY KEY, fp INTEGER);");
+			db.exec("CREATE TABLE IF NOT EXISTS "+tableDictionary+"(encoding TEXT, fp INTEGER PRIMARY KEY);");
 			db.exec("CREATE UNIQUE INDEX IF NOT EXISTS Index_"+tableDictionary+"_fp ON "+tableDictionary+"(fp);");
 			//fingerprint
 			//db.exec("DROP TABLE IF EXISTS "+tableFingerprint);
@@ -83,22 +86,7 @@ public class ExporterSQLite implements IExporter {
 		//Encoding molecules
 		System.out.println("Encoding molecules");
 		ProgressBar progressBar = new ProgressBar(reader.getSize());
-		int fpCounter=1;
 		SQLiteStatement st = null;
-		try {
-			//re-assign fpString to a matching one created previously 
-			st=db.prepare("SELECT MAX(fp) FROM "+tableDictionary);
-			while (st.step()) {
-				fpCounter=st.columnInt(0);
-				fpCounter=fpCounter+1;
-			}
-		} 
-		catch (SQLiteException e2) 
-		{       
-			//System.out.println(e2);
-			fpCounter=1;
-		}
-
 		int cmpdCounter=1;
 		try {
 			//re-assign fpString to a matching one created previously 
@@ -110,11 +98,9 @@ public class ExporterSQLite implements IExporter {
 		} 
 		catch (SQLiteException e2) 
 		{       
-			//System.out.println(e2);
 			cmpdCounter=1;
 		}
 
-		
 		for (int i = 0; i < reader.getSize(); i++) {
 			IAtomContainer mol = reader.getMol(i);
 			FeatureMap featureMap = new FeatureMap(fingerprinter.getFingerprint(mol));
@@ -125,33 +111,9 @@ public class ExporterSQLite implements IExporter {
 				featureMap.setLabel(ExporterHelper.getMolName(mol) + "_INDEX=" + cmpdCounter);
 			}
 
-			//IFeature[] keys = (IFeature[]) featureMap.getKeySet().toArray();
-			Set<IFeature> keys =   featureMap.getKeySet();
-			ArrayList<SortableFeature> Features = new ArrayList<SortableFeature>();
-			SortableFeature sftemp=null;
-			HashMap<String, Integer> keyStrings = new HashMap<String, Integer>();
-			for (IFeature feature : keys) {
-				if (feature instanceof IFeature) {
-					sftemp=new SortableFeature(feature, useAromaticFlag);
-					if(storeOnlyUniqueStrings){
-						String keyString=sftemp.getString();
-						if(!keyStrings.containsKey(keyString)) {
-							Features.add(sftemp);
-							keyStrings.put(keyString,new Integer(1));
-						}
-					}
-					else{
-						Features.add(sftemp);
-					}
-				}
-			}
-			keyStrings=null;
-
 			String cmpdLabel=featureMap.getLabel();
 			String featureString=null;
 			int fpInteger=-1;
-			int lastUsedIndex = 0;
-			Collections.sort(Features);
 			try {
 				db.exec("INSERT INTO "+tableCompounds+"(compoundid,compoundnbr) VALUES ('"+cmpdLabel+"','"+cmpdCounter+"');");
 				if(createPivotedTable){
@@ -183,45 +145,29 @@ public class ExporterSQLite implements IExporter {
 					//All fine compound does not encode this fingerprint
 				}
 			}
-			String currentFeatureString=null;
-			String previousFeatureString=null;
-			for (SortableFeature feature : Features) {
-				if (feature.getHash() == lastUsedIndex) {
+			
+			Set<IFeature> featureKeys = featureMap.getKeySet();
+			HashMap<Integer, SortableFeature> features = new HashMap<Integer, SortableFeature>();
+			for (IFeature feature : featureKeys) {
+				int hashCode = feature.hashCode();
+				if (features.containsKey(hashCode)) {
 					collisions++;
-					continue;
+				} else {
+					features.put(hashCode, new SortableFeature(feature, useAromaticFlag));
 				}
-				fpInteger=fpCounter;
-				featureString=feature.getString(useAromaticFlag) + ":" + df.format(feature.getValue());
-				//skip processing redundant features, aka do not count them up
-				currentFeatureString=featureString;
-				if(previousFeatureString!=null && currentFeatureString!=null) {
-					if (previousFeatureString.equals(currentFeatureString)) {
-						//System.out.println(previousFeatureString.equals(currentFeatureString)+" "+previousFeatureString+" "+currentFeatureString);
-						//skip redundant features
-						continue;
-					}
-				}
+			}
+			
+			for (Integer hashCode : features.keySet()){
+				SortableFeature feature=features.get(hashCode);
+				fpInteger=hashCode;
+				//featureString=feature.getString(useAromaticFlag) + ":" + df.format(feature.getValue());
+				featureString=feature.getString(useAromaticFlag);
 				try {
 					db.exec("INSERT INTO "+tableDictionary+"(encoding, fp) VALUES ('"+featureString+"','"+fpInteger+"');");
-					//only increment when no error, aka no duplication
-					fpCounter++;
 				} 
 				catch (SQLiteException e) 
 				{       
 					// skipping duplicates
-					try {
-						//re-assign fpString to a matching one created previously 
-						st=db.prepare("SELECT fp FROM "+tableDictionary+" WHERE encoding = ?");
-						st.bind(1, featureString);
-						while (st.step()) {
-							fpInteger=st.columnInt(0);
-						}
-					} 
-					catch (SQLiteException e2) 
-					{       
-						System.out.println(e2);
-					}
-					//System.out.println("From previous: encoding='"+featureString+"', fp='"+fpString+"'");
 				}
 				//System.out.println("Details: encoding='"+featureString+"', fp='"+fpString+"'");
 				try {
@@ -231,9 +177,8 @@ public class ExporterSQLite implements IExporter {
 				{       
 					System.out.println(e);
 				}
-				lastUsedIndex = feature.getHash();
-				previousFeatureString=currentFeatureString;
 			}
+			
 			try {
 				db.exec("COMMIT;");
 			} 

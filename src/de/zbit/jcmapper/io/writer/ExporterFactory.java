@@ -8,6 +8,8 @@ public class ExporterFactory {
 			return new ExporterLIBSVMSparse();
 		} else if (type == ExporterType.FULL_CSV) {
 			return new ExporterFullFingerprintCSV();
+		} else if (type == ExporterType.FULL_TAB_UNHASHED) {
+			return new ExporterFullFingerprintTABUnhashed();
 		} else if (type == ExporterType.WEKA_HASHED) {
 			return new ExporterHashWeka();
 		} else if (type == ExporterType.STRING_PATTERNS) {
@@ -25,7 +27,7 @@ public class ExporterFactory {
 	}
 
 	public static enum ExporterType {
-		LIBSVM_SPARSE, LIBSVM_MATRIX, FULL_CSV, STRING_PATTERNS, WEKA_HASHED, WEKA_NOMINAL, BENCHMARKS, SQLITE, NUMERIC_SQLITE;
+		LIBSVM_SPARSE, LIBSVM_MATRIX, FULL_CSV, FULL_TAB_UNHASHED, STRING_PATTERNS, WEKA_HASHED, WEKA_NOMINAL, BENCHMARKS, SQLITE, NUMERIC_SQLITE;
 	}
 
 	public static ExporterType getExporterType(int index) {
@@ -37,6 +39,8 @@ public class ExporterFactory {
 			return ExporterType.BENCHMARKS;
 		} else if (index == ExporterType.FULL_CSV.ordinal()) {
 			return ExporterType.FULL_CSV;
+		} else if (index == ExporterType.FULL_TAB_UNHASHED.ordinal()) {
+			return ExporterType.FULL_TAB_UNHASHED;
 		} else if (index == ExporterType.STRING_PATTERNS.ordinal()) {
 			return ExporterType.STRING_PATTERNS;
 		}else if (index == ExporterType.WEKA_HASHED.ordinal()) {

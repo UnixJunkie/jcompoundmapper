@@ -13,8 +13,8 @@ public class ECFPVariantFeature extends ECFPFeature {
 
 	private final DanglingBond[] connectivityBonds;
 	
-	public ECFPVariantFeature(int feature, IAtom coreAtom, IMolecule substructure, DanglingBond[] connectivityBonds, int iterationNumber) {
-		super(feature, coreAtom, substructure, iterationNumber);
+	public ECFPVariantFeature(int feature, IAtom coreAtom, IMolecule substructure, DanglingBond[] connectivityBonds, int iterationNumber, int parent) {
+		super(feature, coreAtom, substructure, iterationNumber, parent);
 		this.connectivityBonds = connectivityBonds;
 	}
 

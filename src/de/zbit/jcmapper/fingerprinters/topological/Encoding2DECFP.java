@@ -70,7 +70,7 @@ public class Encoding2DECFP extends Encoding2D {
 			for(IBond bond: molecule.getConnectedBondsList(atom)){
 				substructure.addBond(bond);
 			}
-			ECFPFeature ecfpFeature = new ECFPFeature(hashCode, atom ,substructure,this.iteration);
+			ECFPFeature ecfpFeature = new ECFPFeature(hashCode, atom ,substructure,this.iteration,0);
 			this.featuresOfLastIteration.put(atom, ecfpFeature);
 			completeFeatures.add(ecfpFeature);
 		}
@@ -111,7 +111,7 @@ public class Encoding2DECFP extends Encoding2D {
 		}
 		
 		int featureHashCode = computeFeatureHash(oldFeature.hashCode(),connectivity);
-		ECFPFeature newFeature = new ECFPFeature(featureHashCode, atom, newSubstructure, this.iteration);
+		ECFPFeature newFeature = new ECFPFeature(featureHashCode, atom, newSubstructure, this.iteration,oldFeature.hashCode());
 		return newFeature;
 	}
 	

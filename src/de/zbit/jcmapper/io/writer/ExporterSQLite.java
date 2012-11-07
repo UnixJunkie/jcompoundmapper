@@ -6,18 +6,10 @@
 package de.zbit.jcmapper.io.writer;
 
 import java.io.File;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.openscience.cdk.AtomContainer;
-import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.qsar.descriptors.molecular.BCUTDescriptor;
-import org.openscience.cdk.qsar.result.DoubleArrayResult;
 import com.almworks.sqlite4java.SQLiteConnection;
 import com.almworks.sqlite4java.SQLiteException;
 import com.almworks.sqlite4java.SQLiteStatement;
@@ -28,7 +20,6 @@ import de.zbit.jcmapper.fingerprinters.features.IFeature;
 import de.zbit.jcmapper.io.reader.RandomAccessMDLReader;
 import de.zbit.jcmapper.io.writer.feature.SortableFeature;
 import de.zbit.jcmapper.tools.progressbar.ProgressBar;
-import de.zbit.jcmapper.fingerprinters.topological.features.ECFPFeature;
 
 public class ExporterSQLite implements IExporter {
 
@@ -59,7 +50,7 @@ public class ExporterSQLite implements IExporter {
 			db.exec("CREATE UNIQUE INDEX IF NOT EXISTS Index_"+tableDictionary+"_fp ON "+tableDictionary+"(fp);");
 			//fingerprint
 			//db.exec("DROP TABLE IF EXISTS "+tableFingerprint);
-			db.exec("CREATE TABLE IF NOT EXISTS "+tableFingerprint+"(compoundnbr INTEGER, fp INTEGER);");
+			db.exec("CREATE TABLE IF NOT EXISTS "+tableFingerprint+"(compoundnbr INTEGER, fp INTEGER, value REAL);");
 			//compounds
 			//db.exec("DROP TABLE IF EXISTS "+tableCompounds);
 			db.exec("CREATE TABLE IF NOT EXISTS "+tableCompounds+"(compoundid TEXT PRIMARY KEY, compoundnbr INTEGER);");
@@ -78,7 +69,6 @@ public class ExporterSQLite implements IExporter {
 			
 		int collisions = 0;
 		java.util.Locale.setDefault(java.util.Locale.ENGLISH);
-		DecimalFormat df = new DecimalFormat();
 
 		Long start = System.currentTimeMillis();
 		
@@ -162,6 +152,7 @@ public class ExporterSQLite implements IExporter {
 				fpInteger=hashCode;
 				//featureString=feature.getString(useAromaticFlag) + ":" + df.format(feature.getValue());
 				featureString=feature.getString(useAromaticFlag);
+				double fpValue = feature.getValue();
 				try {
 					db.exec("INSERT INTO "+tableDictionary+"(encoding, fp) VALUES ('"+featureString+"','"+fpInteger+"');");
 				} 
@@ -171,7 +162,7 @@ public class ExporterSQLite implements IExporter {
 				}
 				//System.out.println("Details: encoding='"+featureString+"', fp='"+fpString+"'");
 				try {
-					db.exec("INSERT INTO "+tableFingerprint+"(compoundnbr, fp) VALUES ('"+cmpdCounter+"','"+fpInteger+"');");
+					db.exec("INSERT INTO "+tableFingerprint+"(compoundnbr, fp, value) VALUES ('"+cmpdCounter+"','"+fpInteger+"','"+fpValue+"');");
 				} 
 				catch (SQLiteException e) 
 				{       

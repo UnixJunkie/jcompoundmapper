@@ -70,7 +70,7 @@ public class Encoding2DECFPVariant extends Encoding2D {
 			IMolecule substructure = new Molecule();
 			substructure.addAtom(atom);
 			ECFPVariantFeature ecfpFeature = new ECFPVariantFeature(hashCode, atom, substructure,
-													this.generateExtensionBondList(atom), this.currentIteration);
+													this.generateExtensionBondList(atom), this.currentIteration,0);
 			this.hashedAtomLabels.put(atom, hashCode);
 			this.featuresOfLastIteration.put(atom, ecfpFeature);
 			this.completeFeatures.add(ecfpFeature);
@@ -140,7 +140,7 @@ public class Encoding2DECFPVariant extends Encoding2D {
 				new DanglingBond[newConnectionCandidates.size()]);
 		final int featureHashCode = this.computeFeatureHash(oldFeature.hashCode(), connections);
 		final ECFPVariantFeature newFeature = new ECFPVariantFeature(featureHashCode, atom, newSubstructure, newDanglingBonds,
-				this.currentIteration);
+				this.currentIteration,oldFeature.hashCode());
 		this.featuresOfLastIteration.put(atom, newFeature);
 		return newFeature;
 	}

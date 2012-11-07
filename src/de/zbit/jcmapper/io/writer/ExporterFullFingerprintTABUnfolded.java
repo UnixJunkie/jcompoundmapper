@@ -22,9 +22,9 @@ import de.zbit.jcmapper.io.writer.feature.SortableFeature;
 import de.zbit.jcmapper.tools.progressbar.ProgressBar;
 
 
-public class ExporterFullFingerprintTABUnhashed implements IExporter {
+public class ExporterFullFingerprintTABUnfolded implements IExporter {
 
-	public ExporterFullFingerprintTABUnhashed() {
+	public ExporterFullFingerprintTABUnfolded() {
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class ExporterFullFingerprintTABUnhashed implements IExporter {
 				Set<IFeature> featureKeys = featureMap.getKeySet();
 				featureCount = featureCount + featureKeys.size();
 				HashMap<Integer, SortableFeature> features = new HashMap<Integer, SortableFeature>();
-
+			
 				for (IFeature feature : featureKeys) {
 					int hashCode = feature.hashCode();
 					if (features.containsKey(hashCode)) {
@@ -65,6 +65,7 @@ public class ExporterFullFingerprintTABUnhashed implements IExporter {
 					fw.append(featureMap.getLabel() + "\t");
 					fw.append(hashCode.toString()+ "\t");
 					SortableFeature feature=features.get(hashCode);
+					fw.append(feature.getValue()+ "\t");
 					String featureString=feature.getString(useAromaticFlag);
 					fw.append(featureString+ ", ");
 					fw.append("\n");

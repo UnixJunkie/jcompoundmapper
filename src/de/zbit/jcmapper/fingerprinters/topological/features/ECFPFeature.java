@@ -19,12 +19,14 @@ public class ECFPFeature implements IFeature {
 	private int feature;
 	private IMolecule substructure;
 	private int iterationNumber;
+	private int parent;
 	
-	public ECFPFeature(int feature, IAtom coreAtom, IMolecule substructure, int iterationNumber){
+	public ECFPFeature(int feature, IAtom coreAtom, IMolecule substructure, int iterationNumber, int parent) {
 		this.feature = feature;
 		this.substructure = substructure;
-		this.coreAtom=coreAtom;
-		this.iterationNumber=iterationNumber;
+		this.coreAtom = coreAtom;
+		this.iterationNumber = iterationNumber;
+		this.parent = parent;
 	}
 	
 	@Override
@@ -115,6 +117,10 @@ public class ECFPFeature implements IFeature {
 	
 	public int getIterationNumber(){
 		return iterationNumber;
+	}
+
+	public int getParent() {
+		return parent;
 	}
 
 	@Override

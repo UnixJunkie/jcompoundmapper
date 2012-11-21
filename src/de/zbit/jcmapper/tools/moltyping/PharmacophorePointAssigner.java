@@ -73,7 +73,8 @@ public class PharmacophorePointAssigner {
 			return sqt.getUniqueMatchingAtoms();
 		} catch (final CDKException e) {
 			// e.printStackTrace();
-			System.out.println("Warning: SMARTS search skipped because of timeout. Pattern: " + pattern);
+			//We do not want to see all those non-matching patterns
+			//System.out.println("Warning: SMARTS search skipped because of timeout. Pattern: " + pattern);
 			ArrayList<List<Integer>> list = new ArrayList<List<Integer>>();
 			return list;
 		}

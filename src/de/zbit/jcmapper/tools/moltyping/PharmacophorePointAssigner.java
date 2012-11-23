@@ -48,9 +48,10 @@ public class PharmacophorePointAssigner {
 				}
 			}
 		}
-		if (PPPAssignment.size() == 0) {
-			System.out.println("[PPP-Typer] Warning: zero pharmacophore points");
-		}
+		//We do not want to see all those non-matching patterns
+		//if (PPPAssignment.size() == 0) {
+		//	System.out.println("[PPP-Typer] Warning: zero pharmacophore points");
+		//}
 
 		return PPPAssignment;
 	}

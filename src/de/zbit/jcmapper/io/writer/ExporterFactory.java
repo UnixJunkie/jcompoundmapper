@@ -20,14 +20,17 @@ public class ExporterFactory {
 			return new ExporterSparseNominalWeka();
 		} else if (type == ExporterType.SQLITE) {
 			return new ExporterSQLite();
-		} else if (type == ExporterType.NUMERIC_SQLITE) {
-			return new ExporterNumericSQLite();
+		} else if (type == ExporterType.SDF_PROPERTY) {
+			return new ExporterSDFProperty();
+				
+		/* } else if (type == ExporterType.NUMERIC_SQLITE) {
+			return new ExporterNumericSQLite();*/
 		}
 		return new ExporterLIBSVMSparse();
 	}
 
 	public static enum ExporterType {
-		LIBSVM_SPARSE, LIBSVM_MATRIX, FULL_CSV, FULL_TAB_UNFOLDED, STRING_PATTERNS, WEKA_HASHED, WEKA_NOMINAL, BENCHMARKS, SQLITE, NUMERIC_SQLITE;
+		LIBSVM_SPARSE, LIBSVM_MATRIX, FULL_CSV, FULL_TAB_UNFOLDED, STRING_PATTERNS, WEKA_HASHED, WEKA_NOMINAL, BENCHMARKS, SQLITE, NUMERIC_SQLITE, SDF_PROPERTY;
 	}
 
 	public static ExporterType getExporterType(int index) {
@@ -51,6 +54,8 @@ public class ExporterFactory {
 			return ExporterType.SQLITE;
 		}else if (index == ExporterType.NUMERIC_SQLITE.ordinal()) {
 			return ExporterType.NUMERIC_SQLITE;
+		}else if (index == ExporterType.SDF_PROPERTY.ordinal()) {
+			return ExporterType.SDF_PROPERTY;
 		}
 		return ExporterType.LIBSVM_SPARSE;
 	}

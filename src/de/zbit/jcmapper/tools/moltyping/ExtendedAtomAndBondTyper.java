@@ -161,7 +161,7 @@ public class ExtendedAtomAndBondTyper {
 	}
 
 	public static Integer getHydrogenCount(IAtom atom){
-		Integer hydrogenCount = atom.getHydrogenCount();
+		Integer hydrogenCount = atom.getImplicitHydrogenCount();
 		if (hydrogenCount == null)
 			hydrogenCount = 0;
 		return hydrogenCount;

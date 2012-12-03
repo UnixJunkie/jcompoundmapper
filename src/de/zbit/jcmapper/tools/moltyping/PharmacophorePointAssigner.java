@@ -116,7 +116,7 @@ public class PharmacophorePointAssigner {
 				if (b.getOrder().equals(IBond.Order.SINGLE)) {
 					if (!singleBondSeen) {
 						singleBondSeen = true;
-						if (n.getHydrogenCount() > 0)
+						if (n.getImplicitHydrogenCount() > 0)
 							hydrogenSeen = true;
 					} else {
 						return false;

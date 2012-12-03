@@ -6,6 +6,8 @@ public class ExporterFactory {
 			return new ExporterLIBSVMMatrix();
 		} else if (type == ExporterType.LIBSVM_SPARSE) {
 			return new ExporterLIBSVMSparse();
+		} else if (type == ExporterType.LIBSVM_SPARSE_FREQUENCY) {			
+			return new ExporterLIBSVMSparseFrequency();
 		} else if (type == ExporterType.FULL_CSV) {
 			return new ExporterFullFingerprintCSV();
 		} else if (type == ExporterType.FULL_TAB_UNFOLDED) {
@@ -30,7 +32,7 @@ public class ExporterFactory {
 	}
 
 	public static enum ExporterType {
-		LIBSVM_SPARSE, LIBSVM_MATRIX, FULL_CSV, FULL_TAB_UNFOLDED, STRING_PATTERNS, WEKA_HASHED, WEKA_NOMINAL, BENCHMARKS, SQLITE, NUMERIC_SQLITE, SDF_PROPERTY;
+		LIBSVM_SPARSE, LIBSVM_SPARSE_FREQUENCY, LIBSVM_MATRIX, FULL_CSV, FULL_TAB_UNFOLDED, STRING_PATTERNS, WEKA_HASHED, WEKA_NOMINAL, BENCHMARKS, SQLITE, NUMERIC_SQLITE, SDF_PROPERTY;
 	}
 
 	public static ExporterType getExporterType(int index) {
@@ -38,6 +40,8 @@ public class ExporterFactory {
 			return ExporterType.LIBSVM_MATRIX;
 		} else if (index == ExporterType.LIBSVM_SPARSE.ordinal()) {
 			return ExporterType.LIBSVM_SPARSE;
+		} else if (index == ExporterType.LIBSVM_SPARSE_FREQUENCY.ordinal()) {
+			return ExporterType.LIBSVM_SPARSE_FREQUENCY;			
 		} else if (index == ExporterType.BENCHMARKS.ordinal()) {
 			return ExporterType.BENCHMARKS;
 		} else if (index == ExporterType.FULL_CSV.ordinal()) {

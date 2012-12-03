@@ -62,8 +62,10 @@ public class FingerPrinterFactory {
 			return new Encoding2DSHEDKey();
 		} else if (type == FingerprintType.CATS3D) {
 			return new Encoding3DCATS();
-		} else if (type == FingerprintType.ECFP) {
+		} else if (type == FingerprintType.ECFPVariant) {
 			return new Encoding2DECFPVariant();
+		} else if (type == FingerprintType.ECFC) {
+			return new Encoding2DECFP();
 		}
 		throw new FingerPrinterException(ErrorCode.UNKNOWN_FINGERPRINTER_TYPE,FingerPrinterFactory.class.toString(),type.toString());
 	}
@@ -94,6 +96,8 @@ public class FingerPrinterFactory {
 		PHAP3POINT3D,
 
 		ECFP,
+		
+		ECFC,
 		
 		ECFPVariant,
 

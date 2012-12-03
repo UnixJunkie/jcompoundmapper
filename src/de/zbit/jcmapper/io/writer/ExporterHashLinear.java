@@ -15,6 +15,7 @@ import org.openscience.cdk.interfaces.IBond;
 import de.zbit.jcmapper.fingerprinters.EncodingFingerprint;
 import de.zbit.jcmapper.fingerprinters.features.FeatureMap;
 import de.zbit.jcmapper.fingerprinters.features.IFeature;
+import de.zbit.jcmapper.fingerprinters.topological.features.PositionFeature;
 import de.zbit.jcmapper.io.reader.RandomAccessMDLReader;
 import de.zbit.jcmapper.tools.progressbar.ProgressBar;
 
@@ -75,11 +76,18 @@ public abstract class ExporterHashLinear extends ExporterLinear {
 				featureCount = featureCount + keys.size();
 				ArrayList<IFeature> featureBits = new ArrayList<IFeature>();
 				// rehash all features and pack them into a sortable list
+				
+				
+				
 				for (IFeature feature : keys) {
 					if (feature instanceof IFeature) {
-						int localHash = ExporterHelper.rehash(feature.hashCode(), this.hashSpace);
-						IFeature hashedFeature = new HashedBitFeature(localHash);
-						featureBits.add(hashedFeature);
+						if(feature instanceof PositionFeature){
+							featureBits.add(feature);
+						}else{
+							int localHash = ExporterHelper.rehash(feature.hashCode(), this.hashSpace);
+							IFeature hashedFeature = new HashedBitFeature(localHash);
+							featureBits.add(hashedFeature);
+						}
 					}
 				}
 				

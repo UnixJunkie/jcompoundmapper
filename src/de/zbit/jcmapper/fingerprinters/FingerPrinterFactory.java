@@ -19,11 +19,14 @@ import de.zbit.jcmapper.fingerprinters.topological.Encoding2DMolprint;
 import de.zbit.jcmapper.fingerprinters.topological.Encoding2DPharmacophore2Point;
 import de.zbit.jcmapper.fingerprinters.topological.Encoding2DPharmacophore3Point;
 import de.zbit.jcmapper.fingerprinters.topological.Encoding2DSHEDKey;
+import de.zbit.jcmapper.fingerprinters.topological.MACCS166;
 
 public class FingerPrinterFactory {
 
 	public static EncodingFingerprint getFingerprinter(FingerprintType type) throws FingerPrinterException{
-		if (type == FingerprintType.RAD2D) {
+		if (type == FingerprintType.MACCS){
+			return new MACCS166();
+		} else if (type == FingerprintType.RAD2D) {
 			return new Encoding2DMolprint();
 		} else if (type == FingerprintType.RAD3D) {
 			return new Encoding3DMolprint();
@@ -100,6 +103,8 @@ public class FingerPrinterFactory {
 
 		RAD2D,
 
-		RAD3D;
+		RAD3D,
+		
+		MACCS;
 	}
 }

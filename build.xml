@@ -38,6 +38,7 @@
 			</manifest>
 			<fileset dir=".">
 				<filename name="${resource.dir}/CATS2D-SMARTS-DEFINITIONS"/>
+				<filename name="${resource.dir}/MACCS166-SMARTS-DEFINITIONS"/>
 			</fileset>
 		</jar>
 	</target>
@@ -48,6 +49,7 @@
 		    <fileset dir="${classes.dir}"/>
 			<fileset dir=".">
 				<filename name="${resource.dir}/CATS2D-SMARTS-DEFINITIONS"/>
+				<filename name="${resource.dir}/MACCS166-SMARTS-DEFINITIONS"/>
 			</fileset>
 			<archives>
 				<zips>

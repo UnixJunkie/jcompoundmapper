@@ -31,6 +31,7 @@ public class JarInput {
 		try {
 			return url != null ? url.openStream() : null;
 		} catch (IOException e) {
+			System.out.println(e.getMessage());
 			return null;
 		}
 	}

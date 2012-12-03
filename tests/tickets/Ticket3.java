@@ -27,6 +27,7 @@ public class Ticket3 {
 	public void convertToStrings() throws IOException{
 		exporter.export(new RandomAccessMDLReader(new File("./resources/Oxaceprol_MM.sdf")),
 						new Encoding2DECFP(), "s_m_entry_id",
-						new File(System.getProperty("java.io.tmpdir")+"/ticketXY.txt"));
+						new File(System.getProperty("java.io.tmpdir")+"/ticketXY.txt"),
+						true);
 	}
 }

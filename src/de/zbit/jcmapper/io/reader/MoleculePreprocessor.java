@@ -20,15 +20,23 @@ public final class MoleculePreprocessor {
 	 * @throws Exception
 	 */
 	public static Molecule prepareMoleculeRemoveHydrogens(Molecule mol) {
+		boolean errorFlag=false;
+		Molecule molOrig=mol;
 		try {
 			AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(mol);
 			CDKHueckelAromaticityDetector.detectAromaticity(mol);
 			mol = addExplicitHydrogens(mol);
 			
 		} catch (final Exception e) {
-			System.out.println("An error ocurred while typing structure.");
+			//TODO: This is not clean, it is better throwing an Exception and catching it in ALL implementing classes.
+			System.out.println("An error ocurred while typing structure, using unprocessed molecule. "+e.getMessage());
+			e.printStackTrace();
+			errorFlag=true;
  		}
 		mol = removeHydrogens(mol);
+		if(errorFlag){
+			mol=molOrig;
+		}
 		return mol;
 	}
 
@@ -43,7 +51,8 @@ public final class MoleculePreprocessor {
 			AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(mol);
 			CDKHueckelAromaticityDetector.detectAromaticity(mol);
 		} catch (final Exception e) {
-			System.out.println("An error ocurred while typing structure.");
+			System.out.println("An error ocurred while typing structure:"+e.getMessage());
+			//e.printStackTrace();
 		}
 		return mol;
 	}
@@ -73,7 +82,12 @@ public final class MoleculePreprocessor {
 		CDKAtomTypeMatcher matcher = CDKAtomTypeMatcher.getInstance(mol.getBuilder());
 		for (IAtom atom : mol.atoms()) {
 		     IAtomType type = matcher.findMatchingAtomType(mol, atom);
-		     AtomTypeManipulator.configure(atom, type);
+		     try{
+		    	 AtomTypeManipulator.configure(atom, type);
+		     }
+		     catch(IllegalArgumentException e){
+		    	 throw new CDKException(e.toString()+" for atom "+atom.getAtomicNumber()+" "+atom.getSymbol());
+		     }
 		   }
 		CDKHydrogenAdder hydrogenAdder = CDKHydrogenAdder.getInstance(mol.getBuilder());
 		hydrogenAdder.addImplicitHydrogens(mol);

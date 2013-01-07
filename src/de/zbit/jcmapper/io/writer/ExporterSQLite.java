@@ -147,11 +147,14 @@ public class ExporterSQLite implements IExporter {
 				}
 			}
 			
+			featureString="";
 			for (Integer hashCode : features.keySet()){
 				SortableFeature feature=features.get(hashCode);
 				fpInteger=hashCode;
+				//DISABLED, since time complexity bottleneck
+				//USE ExporterNumericSQLite is really needed
 				//featureString=feature.getString(useAromaticFlag) + ":" + df.format(feature.getValue());
-				featureString=feature.getString(useAromaticFlag);
+				//featureString=feature.getString(useAromaticFlag);
 				double fpValue = feature.getValue();
 				try {
 					db.exec("INSERT INTO "+tableDictionary+"(encoding, fp) VALUES ('"+featureString+"','"+fpInteger+"');");

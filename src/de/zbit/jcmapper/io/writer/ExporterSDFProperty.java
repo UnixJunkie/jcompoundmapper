@@ -99,7 +99,7 @@ public class ExporterSDFProperty implements IExporter {
  				Collections.sort(featureBits);
 				String fp = getFingerprint(featureBits);
 				mol.setProperties(mol.getProperties());
-				mol.setProperty("ECFP", fp);
+				mol.setProperty("Fingerprint", fp);
 				sdw.write(mol);
 			}
 

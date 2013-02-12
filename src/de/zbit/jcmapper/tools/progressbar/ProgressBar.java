@@ -60,7 +60,7 @@ public class ProgressBar extends AbstractProgressBar {
 		}
 
 		// Simples File-out oder Eclipse-Output-Window tool. Windows Console
-		// unterstützt leider auch kein ANSI.
+		// unterstuetzt leider auch kein ANSI.
 		if (useSimpleStyle) {
 			if (percent != lastPerc) {
 				System.out.println(percString + ETA + (additionalText != null && (additionalText.length() > 0) ? " " + additionalText : ""));

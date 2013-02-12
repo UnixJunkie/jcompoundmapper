@@ -158,7 +158,7 @@ public class Utils {
 					spaltenCounter.add(0);
 				if (Double.isNaN(d[i][j]))
 					continue; // Deshalb auch der Spaltencounter: Skip NaN
-								// eintr�ge.
+								// eintr?ge.
 				// retVal[j]=retVal[j] * i/(i+1) + d[i][j] * 1/(i+1);
 				retVal[j] = retVal[j] * spaltenCounter.get(j) / (spaltenCounter.get(j) + 1) + d[i][j] * 1 / (spaltenCounter.get(j) + 1);
 				spaltenCounter.set(j, spaltenCounter.get(j) + 1);
@@ -404,8 +404,8 @@ public class Utils {
 	public static int getNumberFromString(int startAtPos, String toParse) {
 		int i = startAtPos;
 		if (i <= 0)
-			return -1; // Schlechte R�ckgabe... aber was sonst? Exception
-						// throwen ist schei�e
+			return -1; // Schlechte R?ckgabe... aber was sonst? Exception
+						// throwen ist schei?e
 
 		String ret = "";
 		while (Character.isDigit(toParse.charAt(i)))
@@ -415,7 +415,7 @@ public class Utils {
 	}
 
 	/**
-	 * Funzt nur f�r positive, nat�rliche Zahlen!
+	 * Funzt nur f?r positive, nat?rliche Zahlen!
 	 */
 	public static int getNumberFromString(String behindLastIndexOfString, String toParse) {
 		int i = toParse.lastIndexOf(behindLastIndexOfString) + 1;
@@ -488,7 +488,7 @@ public class Utils {
 	}
 
 	/**
-	 * Kann auch als Synonym f�r "containsWord" gebraucht werden.
+	 * Kann auch als Synonym f?r "containsWord" gebraucht werden.
 	 * 
 	 * @param containingLine
 	 * @param containedString

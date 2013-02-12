@@ -1,17 +1,52 @@
 package de.zbit.jcmapper.io.reader;
 
-import java.util.Map;
-import org.openscience.cdk.Molecule;
 import org.openscience.cdk.aromaticity.CDKHueckelAromaticityDetector;
 import org.openscience.cdk.atomtype.CDKAtomTypeMatcher;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IAtomType;
+import org.openscience.cdk.io.IChemObjectReaderErrorHandler;
 import org.openscience.cdk.tools.CDKHydrogenAdder;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 import org.openscience.cdk.tools.manipulator.AtomTypeManipulator;
 
+import java.util.Map;
+
 public final class MoleculePreprocessor {
+
+    /**
+     * standard preparation protocol: remove hydrogens, types, ring detection. Uses specified errorHandler
+     *
+     * @param mol
+     * @throws Exception
+     */
+    public static IAtomContainer prepareMoleculeRemoveHydrogens(IAtomContainer mol, IChemObjectReaderErrorHandler errorHandler)
+    {
+        boolean errorFlag=false;
+        IAtomContainer molOrig=mol;
+        try {
+            AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(mol);
+            CDKHueckelAromaticityDetector.detectAromaticity(mol);
+            mol = addExplicitHydrogens(mol);
+
+        } catch (final Exception e) {
+            errorFlag=true;
+
+            if (errorHandler != null)
+                errorHandler.handleError("An error occurred while typing structure. " + e.getMessage(), e);
+            else{
+                System.out.println("An error occurred while typing structure, using unprocessed molecule. "+e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        mol = removeHydrogens(mol);
+        if(errorFlag){
+            mol=molOrig;
+        }
+        return mol;
+    }
+
 
 	/**
 	 * standard preparation protocol: remove hydrogens, types, ring detection
@@ -19,43 +54,40 @@ public final class MoleculePreprocessor {
 	 * @param mol
 	 * @throws Exception
 	 */
-	public static Molecule prepareMoleculeRemoveHydrogens(Molecule mol) {
-		boolean errorFlag=false;
-		Molecule molOrig=mol;
-		try {
-			AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(mol);
-			CDKHueckelAromaticityDetector.detectAromaticity(mol);
-			mol = addExplicitHydrogens(mol);
-			
-		} catch (final Exception e) {
-			//TODO: This is not clean, it is better throwing an Exception and catching it in ALL implementing classes.
-			System.out.println("An error ocurred while typing structure, using unprocessed molecule. "+e.getMessage());
-			e.printStackTrace();
-			errorFlag=true;
- 		}
-		mol = removeHydrogens(mol);
-		if(errorFlag){
-			mol=molOrig;
-		}
-		return mol;
+	public static IAtomContainer prepareMoleculeRemoveHydrogens(IAtomContainer mol) {
+        return prepareMoleculeRemoveHydrogens(mol, null);
 	}
 
 	
 	/**
-	 * types the molecule, leaves the hydrogens attached
+	 * types the molecule, leaves the hydrogens attached. Uses specified error handler
 	 * @param mol
 	 * @return
 	 */
-	public static Molecule prepareMoleculeConserveHydrogens(Molecule mol) {
+	public static IAtomContainer prepareMoleculeConserveHydrogens(IAtomContainer mol, IChemObjectReaderErrorHandler errorHandler) {
 		try {
 			AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(mol);
 			CDKHueckelAromaticityDetector.detectAromaticity(mol);
 		} catch (final Exception e) {
-			System.out.println("An error ocurred while typing structure:"+e.getMessage());
-			//e.printStackTrace();
+            if (errorHandler != null){
+                errorHandler.handleError("An error occurred while typing structure:"+e.getMessage(), e);
+            } else {
+			    System.out.println("An error occurred while typing structure:"+e.getMessage());
+                e.printStackTrace();
+            }
 		}
 		return mol;
 	}
+
+    /**
+     * types the molecule, leaves the hydrogens attached
+     * @param mol
+     * @return
+     */
+    public static IAtomContainer prepareMoleculeConserveHydrogens(IAtomContainer mol)
+    {
+        return prepareMoleculeConserveHydrogens(mol, null);
+    }
 
 
 	/**
@@ -64,9 +96,9 @@ public final class MoleculePreprocessor {
 	 * @param mol
 	 * @throws Exception
 	 */
-	private static Molecule removeHydrogens(Molecule mol) {
+	private static IAtomContainer removeHydrogens(IAtomContainer mol) {
 		final Map<Object, Object> map = mol.getProperties();
-		mol = (Molecule) AtomContainerManipulator.removeHydrogensPreserveMultiplyBonded(mol);
+		mol = AtomContainerManipulator.removeHydrogensPreserveMultiplyBonded(mol);
 		mol.setProperties(map);
 		return mol;
 	}
@@ -77,8 +109,8 @@ public final class MoleculePreprocessor {
 	 * @param mol
 	 * @throws CDKException
 	 */
-	private static Molecule addExplicitHydrogens(Molecule mol) throws CDKException{
-		
+	private static IAtomContainer addExplicitHydrogens(IAtomContainer mol) throws CDKException{
+
 		CDKAtomTypeMatcher matcher = CDKAtomTypeMatcher.getInstance(mol.getBuilder());
 		for (IAtom atom : mol.atoms()) {
 		     IAtomType type = matcher.findMatchingAtomType(mol, atom);
@@ -92,11 +124,11 @@ public final class MoleculePreprocessor {
 		CDKHydrogenAdder hydrogenAdder = CDKHydrogenAdder.getInstance(mol.getBuilder());
 		hydrogenAdder.addImplicitHydrogens(mol);
 		AtomContainerManipulator.convertImplicitToExplicitHydrogens(mol);
-		
+
 		return mol;
-		
+
 	}
-	
+
 	
 	
 }

@@ -1,20 +1,16 @@
 package de.zbit.jcmapper.io.reader;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.StringReader;
+import org.openscience.cdk.ChemFile;
+import org.openscience.cdk.Molecule;
+import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.io.MDLV2000Reader;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.openscience.cdk.ChemFile;
-import org.openscience.cdk.Molecule;
-import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.io.MDLV2000Reader;
 
 public class RandomAccessMDLReader {
 
@@ -158,9 +154,9 @@ public class RandomAccessMDLReader {
 			mol.setProperty("ID", (int) System.currentTimeMillis());
 
 			if (this.removeHydrogens) {
-				mol = MoleculePreprocessor.prepareMoleculeRemoveHydrogens(mol);
+				mol = (Molecule)MoleculePreprocessor.prepareMoleculeRemoveHydrogens(mol);
 			} else {
-				mol = MoleculePreprocessor.prepareMoleculeConserveHydrogens(mol);
+				mol = (Molecule)MoleculePreprocessor.prepareMoleculeConserveHydrogens(mol);
 			}
 			return mol;
 		}
@@ -218,8 +214,7 @@ public class RandomAccessMDLReader {
 
 	/**
 	 * get a type molecule with stripped hydrogens
-	 * 
-	 * @param mdlReader
+	 *
 	 * @param mdlString
 	 * @return
 	 * @throws CDKException

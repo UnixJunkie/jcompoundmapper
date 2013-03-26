@@ -1,18 +1,23 @@
 package de.zbit.jcmapper.io.reader;
 
-import org.openscience.cdk.ChemFile;
-import org.openscience.cdk.Molecule;
-import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.io.MDLV2000Reader;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class RandomAccessMDLReader {
+import org.openscience.cdk.ChemFile;
+import org.openscience.cdk.Molecule;
+import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.io.MDLV2000Reader;
+
+public class RandomAccessMDLReader implements Closeable{
 
 	private ArrayList<Long> molindex;
 	private BufferedRandomAccessFile raf = null;
@@ -154,9 +159,9 @@ public class RandomAccessMDLReader {
 			mol.setProperty("ID", (int) System.currentTimeMillis());
 
 			if (this.removeHydrogens) {
-				mol = (Molecule)MoleculePreprocessor.prepareMoleculeRemoveHydrogens(mol);
+				mol = MoleculePreprocessor.prepareMoleculeRemoveHydrogens(mol);
 			} else {
-				mol = (Molecule)MoleculePreprocessor.prepareMoleculeConserveHydrogens(mol);
+				mol = MoleculePreprocessor.prepareMoleculeConserveHydrogens(mol);
 			}
 			return mol;
 		}
@@ -214,7 +219,8 @@ public class RandomAccessMDLReader {
 
 	/**
 	 * get a type molecule with stripped hydrogens
-	 *
+	 * 
+	 * @param mdlReader
 	 * @param mdlString
 	 * @return
 	 * @throws CDKException
@@ -306,5 +312,10 @@ public class RandomAccessMDLReader {
 		}
 		this.size = c;
 		System.out.print("\n");
+	}
+
+	@Override
+	public void close() throws IOException {
+		this.raf.close();
 	}
 }

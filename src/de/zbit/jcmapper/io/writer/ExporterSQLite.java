@@ -17,6 +17,7 @@ import com.almworks.sqlite4java.SQLiteStatement;
 import de.zbit.jcmapper.fingerprinters.EncodingFingerprint;
 import de.zbit.jcmapper.fingerprinters.features.FeatureMap;
 import de.zbit.jcmapper.fingerprinters.features.IFeature;
+import de.zbit.jcmapper.fingerprinters.topological.Encoding2DECFP;
 import de.zbit.jcmapper.io.reader.RandomAccessMDLReader;
 import de.zbit.jcmapper.io.writer.feature.SortableFeature;
 import de.zbit.jcmapper.tools.progressbar.ProgressBar;
@@ -38,6 +39,11 @@ public class ExporterSQLite implements IExporter {
 		fingerprinterName=fingerprinterName.replace(' ', '_');
 		fingerprinterName=fingerprinterName.replace('-', '_');
 		
+		if(fingerprinter.getNameOfFingerPrinter().equals("ECFP")){
+	      	//switch on substructure hashes, aka do not use default iteration and parent hash lists
+	      	((Encoding2DECFP)fingerprinter).setSubstructureHash(true);
+	       }
+
 		final String tableDictionary="dictionary"+fingerprinterName;
 		final String tableFingerprint="fingerprint"+fingerprinterName;
 		final String tableCompounds="compounds"+fingerprinterName;

@@ -12,9 +12,11 @@ import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.smiles.SmilesGenerator;
 
+import de.zbit.jcmapper.fingerprinters.EncodingFingerprint;
 import de.zbit.jcmapper.fingerprinters.FingerPrinterException;
 import de.zbit.jcmapper.fingerprinters.features.IFeature;
 import de.zbit.jcmapper.fingerprinters.topological.Encoding2DECFP.BondOrderIdentifierTupel;
+import de.zbit.jcmapper.tools.moltyping.MoltyperException;
 
 public class ECFPFeature implements IFeature {
 	
@@ -26,17 +28,26 @@ public class ECFPFeature implements IFeature {
 	private int iterationNumber;
 	private int parent;
 	private List<BondOrderIdentifierTupel> connections;
+	private EncodingFingerprint encodingFingerprint;
 	
-	public ECFPFeature(IAtom coreAtom, IMolecule substructure, int iterationNumber, int parent, List<BondOrderIdentifierTupel> connections) {
+	public ECFPFeature(EncodingFingerprint encodingFingerprint,IAtom coreAtom, IMolecule substructure, int iterationNumber, int parent, List<BondOrderIdentifierTupel> connections) {
 		this.substructure = substructure;
 		this.coreAtom = coreAtom;
 		this.iterationNumber = iterationNumber;
 		this.parent = parent;
 		this.connections = connections;
-		this.feature=computeFeatureHash();
+		this.encodingFingerprint=encodingFingerprint;
+
+		//needs to be the last function call in the constructor
+		this.feature=0;
+		try {
+			this.feature=computeFeatureHash();
+		} catch (MoltyperException e) {
+			//silently do nothing
+		}
 	}
 
-	private int computeFeatureHash(){
+	private int computeFeatureHash() throws MoltyperException{
 		int hashCode=0;
 		if(substructureHash){
 			int atomSize=substructure.getAtomCount();
@@ -44,11 +55,11 @@ public class ECFPFeature implements IFeature {
 			int[] atombondHash = new int[atomSize+bondSize];
 			for(int i=0;i<atomSize;i++){
 				IAtom atom=substructure.getAtom(i);
-				atombondHash[i]=atom.getAtomTypeName().hashCode();
+				atombondHash[i]=this.encodingFingerprint.getAtomLabel(atom).hashCode();
 			}
 			for(int i=0;i<bondSize;i++){
 				IBond bond=substructure.getBond(i);
-				atombondHash[i+atomSize]=bond.getOrder().hashCode();
+				atombondHash[i+atomSize]=this.encodingFingerprint.getBondLabel(bond).hashCode();
 			}
 			Arrays.sort(atombondHash);
 			
@@ -62,8 +73,8 @@ public class ECFPFeature implements IFeature {
 			int[] featureHash = new int[connectionsSize*2+2];
 			featureHash[0] = this.iterationNumber;
 			featureHash[1] = this.parent;
-			System.out.println("this.iterationNumber="+this.iterationNumber);
-			System.out.println("this.parent="+this.parent);
+			//System.out.println("this.iterationNumber="+this.iterationNumber);
+			//System.out.println("this.parent="+this.parent);
 			
 			if (this.connections!=null){
 				Collections.sort(this.connections);
@@ -71,11 +82,11 @@ public class ECFPFeature implements IFeature {
 					BondOrderIdentifierTupel tupel = this.connections.get(i-1);
 					featureHash[i*2]=tupel.bondOrder;
 					featureHash[i*2+1]=tupel.atomIdentifier;
-					System.out.println("featureHash["+i+"*2]=tupel.bondOrder="+tupel.bondOrder);
-					System.out.println("featureHash["+i+"*2+1]=tupel.atomIdentifier="+tupel.atomIdentifier);
+					//System.out.println("featureHash["+i+"*2]=tupel.bondOrder="+tupel.bondOrder);
+					//System.out.println("featureHash["+i+"*2+1]=tupel.atomIdentifier="+tupel.atomIdentifier);
 				}
 			}
-			System.out.println(featureToString(true));
+			//System.out.println(featureToString(true));
 			hashCode=Arrays.hashCode(featureHash);
 		}
 		

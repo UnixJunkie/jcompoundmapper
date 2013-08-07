@@ -31,7 +31,6 @@ public class Encoding2DECFP extends Encoding2D {
 	
 	public Encoding2DECFP(){
 		this.setAtomLabelType(AtomLabelType.DAYLIGHT_INVARIANT_RING);
-		ECFPFeature.setSubstructureHash(false);
 	}
 	
 	@Override
@@ -69,7 +68,7 @@ public class Encoding2DECFP extends Encoding2D {
 				substructure.addBond(bond);
 			}
 			//System.out.println("initial "+this.getAtomLabel(atom)+",id="+this.getAtomLabel(atom).hashCode());
-			ECFPFeature ecfpFeature = new ECFPFeature(atom, substructure,this.iteration,this.getAtomLabel(atom).hashCode(), null);
+			ECFPFeature ecfpFeature = new ECFPFeature(this, atom, substructure,this.iteration,this.getAtomLabel(atom).hashCode(), null);
 			this.featuresOfLastIteration.put(atom, ecfpFeature);
 			completeFeatures.add(ecfpFeature);
 		}
@@ -110,11 +109,18 @@ public class Encoding2DECFP extends Encoding2D {
 			}
 		}
 		
-		ECFPFeature newFeature = new ECFPFeature(atom, newSubstructure, this.iteration,oldFeature.hashCode(), connectivity);
+		ECFPFeature newFeature = new ECFPFeature(this, atom, newSubstructure, this.iteration,oldFeature.hashCode(), connectivity);
 		return newFeature;
 	}
 	
+	public boolean isSubstructureHash() {
+		return ECFPFeature.isSubstructureHash();
+	}
 
+	public void setSubstructureHash(boolean substructureHash) {
+		ECFPFeature.setSubstructureHash(substructureHash);
+	}
+	
 	private void removeDuplicateSubstructures(Collection<ECFPFeature> newFeatures){
 		Iterator<ECFPFeature> iter = newFeatures.iterator();
 		

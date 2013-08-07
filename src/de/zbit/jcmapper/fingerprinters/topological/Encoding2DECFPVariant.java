@@ -33,7 +33,6 @@ public class Encoding2DECFPVariant extends Encoding2D {
 	public Encoding2DECFPVariant() {
 		super.setSearchDepth(4);
 		super.setAtomLabelType(AtomLabelType.DAYLIGHT_INVARIANT_RING);
-		ECFPFeature.setSubstructureHash(false);
 	}
 	
 	@Override
@@ -69,7 +68,7 @@ public class Encoding2DECFPVariant extends Encoding2D {
 		for (IAtom atom : this.molecule.atoms()) {
 			IMolecule substructure = new Molecule();
 			substructure.addAtom(atom);
-			ECFPVariantFeature ecfpFeature = new ECFPVariantFeature(atom, substructure,
+			ECFPVariantFeature ecfpFeature = new ECFPVariantFeature(this, atom, substructure,
 													this.generateExtensionBondList(atom), this.currentIteration,this.getAtomLabel(atom).hashCode(),null);
 			this.hashedAtomLabels.put(atom, ecfpFeature.hashCode());
 			this.featuresOfLastIteration.put(atom, ecfpFeature);
@@ -139,7 +138,7 @@ public class Encoding2DECFPVariant extends Encoding2D {
 		final DanglingBond[] newDanglingBonds = newConnectionCandidates.values().toArray(
 				new DanglingBond[newConnectionCandidates.size()]);
 		
-		final ECFPVariantFeature newFeature = new ECFPVariantFeature(atom, newSubstructure, newDanglingBonds,
+		final ECFPVariantFeature newFeature = new ECFPVariantFeature(this, atom, newSubstructure, newDanglingBonds,
 				this.currentIteration,oldFeature.hashCode(), connections);
 		
 		this.featuresOfLastIteration.put(atom, newFeature);

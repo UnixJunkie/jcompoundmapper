@@ -29,6 +29,7 @@ import de.zbit.jcmapper.fingerprinters.features.IFeature;
 import de.zbit.jcmapper.io.reader.RandomAccessMDLReader;
 import de.zbit.jcmapper.io.writer.feature.SortableFeature;
 import de.zbit.jcmapper.tools.progressbar.ProgressBar;
+import de.zbit.jcmapper.fingerprinters.topological.Encoding2DECFP;
 import de.zbit.jcmapper.fingerprinters.topological.features.ECFPFeature;
 
 public class ExporterNumericSQLite implements IExporter {
@@ -47,13 +48,19 @@ public class ExporterNumericSQLite implements IExporter {
       fingerprinterName = fingerprinterName.replace(' ', '_');
       fingerprinterName = fingerprinterName.replace('-', '_');
       
+      if(fingerprinter.getNameOfFingerPrinter().equals("ECFP")){
+      	//switch on substructure hashes, aka do not use default iteration and parent hash lists
+      	((Encoding2DECFP)fingerprinter).setSubstructureHash(true);
+       }
+     
       final String tableDictionary = "dictionary" + fingerprinterName;
       final String tableFingerprint = "fingerprint" + fingerprinterName;
       final String tableCompounds = "compounds" + fingerprinterName;
       try {
          db.open(true);
          if(storeFingerprintSimilarity && fingerprinterName.equals("ECFP")){
-            db.exec("CREATE TABLE IF NOT EXISTS " + tableDictionary + "(encoding TEXT, fp INTEGER PRIMARY KEY, bc1 REAL, bc2 REAL, bc3 REAL, bc4 REAL, bc5 REAL, bc6 REAL, doublebonds INTEGER, atoms INTEGER, iteration INTEGER, parent INTEGER);");
+        	// create numeric property table
+        	db.exec("CREATE TABLE IF NOT EXISTS " + tableDictionary + "(encoding TEXT, fp INTEGER PRIMARY KEY, bc1 REAL, bc2 REAL, bc3 REAL, bc4 REAL, bc5 REAL, bc6 REAL, doublebonds INTEGER, atoms INTEGER, iteration INTEGER, parent INTEGER);");
          } else{
             db.exec("CREATE TABLE IF NOT EXISTS " + tableDictionary + "(encoding TEXT, fp INTEGER PRIMARY KEY);");
          }

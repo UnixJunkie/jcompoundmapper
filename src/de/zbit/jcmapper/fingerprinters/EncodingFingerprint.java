@@ -16,7 +16,7 @@ public abstract class EncodingFingerprint {
 
 	private final ExtendedAtomAndBondTyper atomTyper = new ExtendedAtomAndBondTyper(AtomLabelType.ELEMENT_NEIGHBOR);
 
-	protected String getAtomLabel(IAtom atom) throws MoltyperException {
+	public String getAtomLabel(IAtom atom) throws MoltyperException {
 		return this.atomTyper.getAtomLabel(atom);
 	}
 
@@ -24,7 +24,7 @@ public abstract class EncodingFingerprint {
 		return this.atomTyper.getAtomLabelType();
 	}
 
-	protected String getBondLabel(IBond bond) throws MoltyperException {
+	public String getBondLabel(IBond bond) throws MoltyperException {
 		return ExtendedAtomAndBondTyper.getBondSymbol(bond);
 	}
 

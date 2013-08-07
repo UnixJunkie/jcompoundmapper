@@ -17,6 +17,7 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import de.zbit.jcmapper.fingerprinters.EncodingFingerprint;
 import de.zbit.jcmapper.fingerprinters.features.FeatureMap;
 import de.zbit.jcmapper.fingerprinters.features.IFeature;
+import de.zbit.jcmapper.fingerprinters.topological.Encoding2DECFP;
 import de.zbit.jcmapper.io.reader.RandomAccessMDLReader;
 import de.zbit.jcmapper.io.writer.feature.SortableFeature;
 import de.zbit.jcmapper.tools.progressbar.ProgressBar;
@@ -35,6 +36,11 @@ public class ExporterFullFingerprintTABUnfolded implements IExporter {
 			double collisions = 0;
 			double featureCount = 0.0;
 			Long start = System.currentTimeMillis();
+			
+			if(fingerprinter.getNameOfFingerPrinter().equals("ECFP")){
+	        	//switch on substructure hashes, aka do not use default iteration and parent hash lists
+	        	((Encoding2DECFP)fingerprinter).setSubstructureHash(true);
+	         }
 			
 			ProgressBar progressBar = new ProgressBar(reader.getSize());
 			for (int i = 0; i < reader.getSize(); i++) {

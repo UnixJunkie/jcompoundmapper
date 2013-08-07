@@ -9,12 +9,14 @@ import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.smiles.SmilesGenerator;
 
+import de.zbit.jcmapper.fingerprinters.topological.Encoding2DECFP.BondOrderIdentifierTupel;
+
 public class ECFPVariantFeature extends ECFPFeature {
 
 	private final DanglingBond[] connectivityBonds;
 	
-	public ECFPVariantFeature(int feature, IAtom coreAtom, IMolecule substructure, DanglingBond[] connectivityBonds, int iterationNumber, int parent) {
-		super(feature, coreAtom, substructure, iterationNumber, parent);
+	public ECFPVariantFeature(IAtom coreAtom, IMolecule substructure, DanglingBond[] connectivityBonds, int iterationNumber, int parent, List<BondOrderIdentifierTupel> connections) {
+		super(coreAtom, substructure, iterationNumber, parent, connections);
 		this.connectivityBonds = connectivityBonds;
 	}
 

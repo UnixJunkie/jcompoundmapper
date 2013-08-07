@@ -1,9 +1,7 @@
 package de.zbit.jcmapper.fingerprinters.topological;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -33,6 +31,7 @@ public class Encoding2DECFP extends Encoding2D {
 	
 	public Encoding2DECFP(){
 		this.setAtomLabelType(AtomLabelType.DAYLIGHT_INVARIANT_RING);
+		ECFPFeature.setSubstructureHash(false);
 	}
 	
 	@Override
@@ -64,13 +63,13 @@ public class Encoding2DECFP extends Encoding2D {
 	
 	private void computeInitialIdentifiers() throws FingerPrinterException, MoltyperException{
 		for(IAtom atom: molecule.atoms()){
-			int hashCode = this.getAtomLabel(atom).hashCode();
 			IMolecule substructure = new Molecule();
 			substructure.addAtom(atom);
 			for(IBond bond: molecule.getConnectedBondsList(atom)){
 				substructure.addBond(bond);
 			}
-			ECFPFeature ecfpFeature = new ECFPFeature(hashCode, atom ,substructure,this.iteration,0);
+			//System.out.println("initial "+this.getAtomLabel(atom)+",id="+this.getAtomLabel(atom).hashCode());
+			ECFPFeature ecfpFeature = new ECFPFeature(atom, substructure,this.iteration,this.getAtomLabel(atom).hashCode(), null);
 			this.featuresOfLastIteration.put(atom, ecfpFeature);
 			completeFeatures.add(ecfpFeature);
 		}
@@ -98,6 +97,7 @@ public class Encoding2DECFP extends Encoding2D {
 
 		for(IAtom connectedAtom: molecule.getConnectedAtomsList(atom)){
 			int identifierOfConnectedAtom = featuresOfLastIteration.get(connectedAtom).hashCode();
+			//System.out.println("iterate "+connectedAtom.getAtomTypeName()+",id="+identifierOfConnectedAtom+",id="+featuresOfLastIteration.get(connectedAtom).featureToString(true));
 			connectivity.add(new BondOrderIdentifierTupel(this.getBondOrder(molecule.getBond(atom,connectedAtom)),identifierOfConnectedAtom));
 			IMolecule structure = this.featuresOfLastIteration.get(connectedAtom).representedSubstructure();
 			for(IAtom a: structure.atoms()){
@@ -110,27 +110,11 @@ public class Encoding2DECFP extends Encoding2D {
 			}
 		}
 		
-		int featureHashCode = computeFeatureHash(oldFeature.hashCode(),connectivity);
-		ECFPFeature newFeature = new ECFPFeature(featureHashCode, atom, newSubstructure, this.iteration,oldFeature.hashCode());
+		ECFPFeature newFeature = new ECFPFeature(atom, newSubstructure, this.iteration,oldFeature.hashCode(), connectivity);
 		return newFeature;
 	}
 	
-	private int computeFeatureHash(int featureOfCoreAtom, List<BondOrderIdentifierTupel> extensions){
-		int[] featureHash = new int[extensions.size()*2+2];
-		featureHash[0] = iteration;
-		featureHash[1] = featureOfCoreAtom;
-		
-		Collections.sort(extensions);
-		
-		for(int i=1;i<=extensions.size();i++){
-			BondOrderIdentifierTupel tupel = extensions.get(i-1);
-			featureHash[i*2]=tupel.bondOrder;
-			featureHash[i*2+1]=tupel.atomIdentifier;
-		}
 
-		return Arrays.hashCode(featureHash);
-	}
-	
 	private void removeDuplicateSubstructures(Collection<ECFPFeature> newFeatures){
 		Iterator<ECFPFeature> iter = newFeatures.iterator();
 		
@@ -165,9 +149,13 @@ public class Encoding2DECFP extends Encoding2D {
 		return "ECFP";
 	}
 	
-	private class BondOrderIdentifierTupel implements Comparable<BondOrderIdentifierTupel>{
-		private int bondOrder;
-		private int atomIdentifier;
+	public static BondOrderIdentifierTupel getNewBondOrderIdentifierTupel(int bondOrder, int atomIdentifier){
+		return new BondOrderIdentifierTupel(bondOrder, atomIdentifier);
+	}
+	
+	public static class BondOrderIdentifierTupel implements Comparable<BondOrderIdentifierTupel>{
+		public int bondOrder;
+		public int atomIdentifier;
 		
 		public BondOrderIdentifierTupel(int bondOrder, int atomIdentifier){
 			this.bondOrder=bondOrder;

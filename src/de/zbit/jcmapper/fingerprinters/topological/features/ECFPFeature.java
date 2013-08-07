@@ -1,6 +1,9 @@
 package de.zbit.jcmapper.fingerprinters.topological.features;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.openscience.cdk.Molecule;
 import org.openscience.cdk.PseudoAtom;
@@ -11,24 +14,84 @@ import org.openscience.cdk.smiles.SmilesGenerator;
 
 import de.zbit.jcmapper.fingerprinters.FingerPrinterException;
 import de.zbit.jcmapper.fingerprinters.features.IFeature;
-
+import de.zbit.jcmapper.fingerprinters.topological.Encoding2DECFP.BondOrderIdentifierTupel;
 
 public class ECFPFeature implements IFeature {
+	
+	private static boolean substructureHash=false; 
 	
 	private IAtom coreAtom;
 	private int feature;
 	private IMolecule substructure;
 	private int iterationNumber;
 	private int parent;
+	private List<BondOrderIdentifierTupel> connections;
 	
-	public ECFPFeature(int feature, IAtom coreAtom, IMolecule substructure, int iterationNumber, int parent) {
-		this.feature = feature;
+	public ECFPFeature(IAtom coreAtom, IMolecule substructure, int iterationNumber, int parent, List<BondOrderIdentifierTupel> connections) {
 		this.substructure = substructure;
 		this.coreAtom = coreAtom;
 		this.iterationNumber = iterationNumber;
 		this.parent = parent;
+		this.connections = connections;
+		this.feature=computeFeatureHash();
 	}
-	
+
+	private int computeFeatureHash(){
+		int hashCode=0;
+		if(substructureHash){
+			int atomSize=substructure.getAtomCount();
+			int bondSize=substructure.getBondCount();
+			int[] atombondHash = new int[atomSize+bondSize];
+			for(int i=0;i<atomSize;i++){
+				IAtom atom=substructure.getAtom(i);
+				atombondHash[i]=atom.getAtomTypeName().hashCode();
+			}
+			for(int i=0;i<bondSize;i++){
+				IBond bond=substructure.getBond(i);
+				atombondHash[i+atomSize]=bond.getOrder().hashCode();
+			}
+			Arrays.sort(atombondHash);
+			
+			hashCode=Arrays.hashCode(atombondHash);
+		}
+		else{
+			int connectionsSize=0;
+			if (this.connections!=null){
+				connectionsSize=this.connections.size();
+			}
+			int[] featureHash = new int[connectionsSize*2+2];
+			featureHash[0] = this.iterationNumber;
+			featureHash[1] = this.parent;
+			System.out.println("this.iterationNumber="+this.iterationNumber);
+			System.out.println("this.parent="+this.parent);
+			
+			if (this.connections!=null){
+				Collections.sort(this.connections);
+				for(int i=1;i<=this.connections.size();i++){
+					BondOrderIdentifierTupel tupel = this.connections.get(i-1);
+					featureHash[i*2]=tupel.bondOrder;
+					featureHash[i*2+1]=tupel.atomIdentifier;
+					System.out.println("featureHash["+i+"*2]=tupel.bondOrder="+tupel.bondOrder);
+					System.out.println("featureHash["+i+"*2+1]=tupel.atomIdentifier="+tupel.atomIdentifier);
+				}
+			}
+			System.out.println(featureToString(true));
+			hashCode=Arrays.hashCode(featureHash);
+		}
+		
+		//System.out.println("hashCode="+hashCode);
+		return hashCode;
+	}
+
+	public static boolean isSubstructureHash() {
+		return substructureHash;
+	}
+
+	public static void setSubstructureHash(boolean substructureHash) {
+		ECFPFeature.substructureHash = substructureHash;
+	}
+
+
 	@Override
 	public int hashCode() {
 		return feature;
@@ -142,5 +205,6 @@ public class ECFPFeature implements IFeature {
 	public IMolecule representedSubstructure(){
 		return this.substructure;
 	}
+	
 }
 

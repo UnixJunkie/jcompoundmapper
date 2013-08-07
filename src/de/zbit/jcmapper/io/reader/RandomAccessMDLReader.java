@@ -159,9 +159,9 @@ public class RandomAccessMDLReader implements Closeable{
 			mol.setProperty("ID", (int) System.currentTimeMillis());
 
 			if (this.removeHydrogens) {
-				mol = MoleculePreprocessor.prepareMoleculeRemoveHydrogens(mol);
+				mol = (Molecule)MoleculePreprocessor.prepareMoleculeRemoveHydrogens(mol);
 			} else {
-				mol = MoleculePreprocessor.prepareMoleculeConserveHydrogens(mol);
+				mol = (Molecule)MoleculePreprocessor.prepareMoleculeConserveHydrogens(mol);
 			}
 			return mol;
 		}

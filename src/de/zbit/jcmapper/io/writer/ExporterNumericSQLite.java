@@ -8,17 +8,12 @@
  package de.zbit.jcmapper.io.writer;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.qsar.descriptors.molecular.BCUTDescriptor;
-import org.openscience.cdk.qsar.result.DoubleArrayResult;
 import com.almworks.sqlite4java.SQLiteConnection;
 import com.almworks.sqlite4java.SQLiteException;
 import com.almworks.sqlite4java.SQLiteStatement;
@@ -158,7 +153,7 @@ public class ExporterNumericSQLite implements IExporter {
                         nDoubleBonds++;
                      }
                   }
-                  double fpp[] = getFingerprintProperties(mol, featureString,(ECFPFeature)feature.getFeature());
+                  double fpp[] = ((ECFPFeature)feature.getFeature()).getBcutProperties();
                   db.exec("INSERT INTO " + tableDictionary + "(encoding, fp, bc1, bc2, bc3, bc4, bc5, bc6,doublebonds,atoms,iteration,parent) VALUES ('" + featureString + "','" + fpInteger + "','" + fpp[0] + "','" + fpp[1] + "','" + fpp[2] + "','" + fpp[3] + "','" + fpp[4] + "','" + fpp[5] + "','"  + nDoubleBonds + "','" + nAtoms + "','" + iteration  + "','" + parent + "');");
                } else{
                   db.exec("INSERT INTO " + tableDictionary + "(encoding, fp) VALUES ('" + featureString + "','" + fpInteger + "');");
@@ -190,59 +185,6 @@ public class ExporterNumericSQLite implements IExporter {
       System.out.println("Time elapsed: " + (end - start) + " ms");
       System.out.println("Collisions:" + collisions);
       db.dispose();
-   }
-
-   private double[] getFingerprintProperties(
-      IAtomContainer mol,
-      String featureString,
-      ECFPFeature feature
-   ) {
-      double fingerprintProperties[] = null;
-      IMolecule imol = feature.representedSubstructure();
-      ArrayList<Integer> al = new ArrayList<Integer>(); 
-      for(IAtom atom: imol.atoms()){
-         al.add(new Integer(mol.getAtomNumber(atom)));
-      }
-      int aindices[] = new int[al.size()];
-      for(int io = 0; io<al.size(); io++) {
-         aindices[io] = al.get(io).intValue();
-      }
-      IMolecule imolsub = null;
-      try {
-         imolsub = (IMolecule) extractSubstructure(mol,aindices);
-      } catch (CloneNotSupportedException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
-      }
-      BCUTDescriptor bcut = new BCUTDescriptor();
-      DoubleArrayResult BCUTvalue = (DoubleArrayResult) ((BCUTDescriptor) bcut).calculate(imolsub).getValue();
-      fingerprintProperties = new double[6];
-      for (int iii = 0; iii < 6; iii++) {
-         fingerprintProperties[iii] = BCUTvalue.get(iii);
-      }
-      return fingerprintProperties;
-   }
-   
-   // The new CDK provides this AtomContainerManipulator.extractSubstructure method, 
-   // so this code snippet might get replaced with the CDK package code in the future
-   private static IAtomContainer extractSubstructure(
-      IAtomContainer atomContainer,
-      int... atomIndices
-   ) throws CloneNotSupportedException {
-      IAtomContainer substructure = (IAtomContainer) atomContainer.clone();
-      int numberOfAtoms = substructure.getAtomCount();
-      IAtom[] atoms = new IAtom[numberOfAtoms];
-      for (int atomIndex = 0; atomIndex < numberOfAtoms; atomIndex++) {
-         atoms[atomIndex] = substructure.getAtom(atomIndex);
-      }
-      Arrays.sort(atomIndices);
-      for (int index = 0; index < numberOfAtoms; index++) {
-         if (Arrays.binarySearch(atomIndices, index) < 0) {
-            IAtom atom = atoms[index];
-            substructure.removeAtomAndConnectedElectronContainers(atom);
-         }
-     }
-     return substructure;
    }
    
 }

@@ -8,13 +8,17 @@ import java.util.List;
 import org.openscience.cdk.Molecule;
 import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IMolecule;
+import org.openscience.cdk.qsar.descriptors.molecular.BCUTDescriptor;
+import org.openscience.cdk.qsar.result.DoubleArrayResult;
 import org.openscience.cdk.smiles.SmilesGenerator;
 
 import de.zbit.jcmapper.fingerprinters.EncodingFingerprint;
 import de.zbit.jcmapper.fingerprinters.FingerPrinterException;
 import de.zbit.jcmapper.fingerprinters.features.IFeature;
+import de.zbit.jcmapper.fingerprinters.topological.Encoding2DECFP;
 import de.zbit.jcmapper.fingerprinters.topological.Encoding2DECFP.BondOrderIdentifierTupel;
 import de.zbit.jcmapper.tools.moltyping.MoltyperException;
 
@@ -52,18 +56,25 @@ public class ECFPFeature implements IFeature {
 		if(substructureHash){
 			int atomSize=substructure.getAtomCount();
 			int bondSize=substructure.getBondCount();
-			int[] atombondHash = new int[atomSize+bondSize];
+			//topology ignorant, we will not know how those atoms and bonds are connected
+			double[] atomBondBcutHash = new double[atomSize+bondSize+6];
 			for(int i=0;i<atomSize;i++){
 				IAtom atom=substructure.getAtom(i);
-				atombondHash[i]=this.encodingFingerprint.getAtomLabel(atom).hashCode();
+				atomBondBcutHash[i]=this.encodingFingerprint.getAtomLabel(atom).hashCode();
 			}
 			for(int i=0;i<bondSize;i++){
 				IBond bond=substructure.getBond(i);
-				atombondHash[i+atomSize]=this.encodingFingerprint.getBondLabel(bond).hashCode();
+				atomBondBcutHash[i+atomSize]=this.encodingFingerprint.getBondLabel(bond).hashCode();
 			}
-			Arrays.sort(atombondHash);
+			//now, lets make sure we capture the topology even with some chemistry knowledge 
+			double bcut[]=getBcutProperties();
+		    for (int i = 0; i < 6; i++) {
+		    	atomBondBcutHash[i+atomSize+bondSize] = bcut[i];
+		    }
 			
-			hashCode=Arrays.hashCode(atombondHash);
+			Arrays.sort(atomBondBcutHash);
+			
+			hashCode=Arrays.hashCode(atomBondBcutHash);
 		}
 		else{
 			int connectionsSize=0;
@@ -217,5 +228,53 @@ public class ECFPFeature implements IFeature {
 		return this.substructure;
 	}
 	
+	public double[] getBcutProperties() {
+		      double fingerprintProperties[] = null;
+		      IMolecule imol = this.representedSubstructure();
+		      ArrayList<Integer> al = new ArrayList<Integer>(); 
+		      for(IAtom atom: imol.atoms()){
+		         al.add(new Integer(((Encoding2DECFP)this.encodingFingerprint).getMolecule().getAtomNumber(atom)));
+		      }
+		      int aindices[] = new int[al.size()];
+		      for(int io = 0; io<al.size(); io++) {
+		         aindices[io] = al.get(io).intValue();
+		      }
+		      IMolecule imolsub = null;
+		      try {
+		         imolsub = (IMolecule) extractSubstructure(((Encoding2DECFP)this.encodingFingerprint).getMolecule(),aindices);
+		      } catch (CloneNotSupportedException e) {
+		         // TODO Auto-generated catch block
+		         e.printStackTrace();
+		      }
+		      BCUTDescriptor bcut = new BCUTDescriptor();
+		      DoubleArrayResult BCUTvalue = (DoubleArrayResult) ((BCUTDescriptor) bcut).calculate(imolsub).getValue();
+		      fingerprintProperties = new double[6];
+		      for (int iii = 0; iii < 6; iii++) {
+		         fingerprintProperties[iii] = BCUTvalue.get(iii);
+		      }
+		      return fingerprintProperties;
+		   }
+	   
+	   // The new CDK provides this AtomContainerManipulator.extractSubstructure method, 
+	   // so this code snippet might get replaced with the CDK package code in the future
+	   private static IAtomContainer extractSubstructure(
+	      IAtomContainer atomContainer,
+	      int... atomIndices
+	   ) throws CloneNotSupportedException {
+	      IAtomContainer substructure = (IAtomContainer) atomContainer.clone();
+	      int numberOfAtoms = substructure.getAtomCount();
+	      IAtom[] atoms = new IAtom[numberOfAtoms];
+	      for (int atomIndex = 0; atomIndex < numberOfAtoms; atomIndex++) {
+	         atoms[atomIndex] = substructure.getAtom(atomIndex);
+	      }
+	      Arrays.sort(atomIndices);
+	      for (int index = 0; index < numberOfAtoms; index++) {
+	         if (Arrays.binarySearch(atomIndices, index) < 0) {
+	            IAtom atom = atoms[index];
+	            substructure.removeAtomAndConnectedElectronContainers(atom);
+	         }
+	     }
+	     return substructure;
+	   }
 }
 

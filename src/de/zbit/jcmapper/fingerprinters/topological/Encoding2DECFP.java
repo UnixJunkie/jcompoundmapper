@@ -27,12 +27,18 @@ public class Encoding2DECFP extends Encoding2D {
 	private int iteration;
 	private ArrayList<IFeature> completeFeatures;
 	private IAtomContainer molecule;
+	
+
 	private Map<IAtom,ECFPFeature> featuresOfLastIteration;
 	
 	public Encoding2DECFP(){
 		this.setAtomLabelType(AtomLabelType.DAYLIGHT_INVARIANT_RING);
 	}
 	
+	public IAtomContainer getMolecule() {
+		return molecule;
+	}
+
 	@Override
 	public ArrayList<IFeature> getFingerprint(IAtomContainer molecule){
 		try{

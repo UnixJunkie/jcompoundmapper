@@ -70,6 +70,7 @@ public class ECFPFeature implements IFeature {
 			double bcut[]=getBcutProperties();
 		    for (int i = 0; i < 6; i++) {
 		    	atomBondBcutHash[i+atomSize+bondSize] = bcut[i];
+		    	//System.out.println("bcut "+i+" "+bcut[i]);
 		    }
 			
 			Arrays.sort(atomBondBcutHash);
@@ -97,11 +98,12 @@ public class ECFPFeature implements IFeature {
 					//System.out.println("featureHash["+i+"*2+1]=tupel.atomIdentifier="+tupel.atomIdentifier);
 				}
 			}
-			//System.out.println(featureToString(true));
 			hashCode=Arrays.hashCode(featureHash);
 		}
 		
-		//System.out.println("hashCode="+hashCode);
+		//System.out.println("substructure= "+featureToString(true));
+		//System.out.println("hashCode= "+hashCode);
+		//System.out.println("====================");
 		return hashCode;
 	}
 
@@ -233,7 +235,9 @@ public class ECFPFeature implements IFeature {
 		      IMolecule imol = this.representedSubstructure();
 		      ArrayList<Integer> al = new ArrayList<Integer>(); 
 		      for(IAtom atom: imol.atoms()){
-		         al.add(new Integer(((Encoding2DECFP)this.encodingFingerprint).getMolecule().getAtomNumber(atom)));
+		    	 Integer atomNumber=new Integer(((Encoding2DECFP)this.encodingFingerprint).getMolecule().getAtomNumber(atom));
+		         al.add(atomNumber);
+		         //System.out.println("atom index "+atomNumber+" element "+atom.getSymbol()+" type "+atom.getAtomTypeName());
 		      }
 		      int aindices[] = new int[al.size()];
 		      for(int io = 0; io<al.size(); io++) {
@@ -249,8 +253,11 @@ public class ECFPFeature implements IFeature {
 		      BCUTDescriptor bcut = new BCUTDescriptor();
 		      DoubleArrayResult BCUTvalue = (DoubleArrayResult) ((BCUTDescriptor) bcut).calculate(imolsub).getValue();
 		      fingerprintProperties = new double[6];
+		      //int precision = 100000; //keep 4 digits
+		      //int precision = 10; //keep 1 digits
+		      int precision = 1; //keep 0 digits
 		      for (int iii = 0; iii < 6; iii++) {
-		         fingerprintProperties[iii] = BCUTvalue.get(iii);
+		         fingerprintProperties[iii] = Math.floor(BCUTvalue.get(iii) * precision +.5)/precision;
 		      }
 		      return fingerprintProperties;
 		   }

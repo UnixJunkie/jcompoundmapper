@@ -24,7 +24,8 @@ import de.zbit.jcmapper.tools.moltyping.MoltyperException;
 
 public class ECFPFeature implements IFeature {
 	
-	private static boolean substructureHash=false; 
+	// set substructure hashing as default!
+	private static boolean substructureHash=true; 
 	
 	private IAtom coreAtom;
 	private int feature;
@@ -60,17 +61,19 @@ public class ECFPFeature implements IFeature {
 			double[] atomBondBcutHash = new double[atomSize+bondSize+6];
 			for(int i=0;i<atomSize;i++){
 				IAtom atom=substructure.getAtom(i);
+				//System.out.println("Hashing atom "+i+" label "+this.encodingFingerprint.getAtomLabel(atom));
 				atomBondBcutHash[i]=this.encodingFingerprint.getAtomLabel(atom).hashCode();
 			}
 			for(int i=0;i<bondSize;i++){
 				IBond bond=substructure.getBond(i);
+				//System.out.println("Hashing bond "+i+" label "+this.encodingFingerprint.getBondLabel(bond));
 				atomBondBcutHash[i+atomSize]=this.encodingFingerprint.getBondLabel(bond).hashCode();
 			}
 			//now, lets make sure we capture the topology even with some chemistry knowledge 
 			double bcut[]=getBcutProperties();
 		    for (int i = 0; i < 6; i++) {
 		    	atomBondBcutHash[i+atomSize+bondSize] = bcut[i];
-		    	//System.out.println("bcut "+i+" "+bcut[i]);
+		    	//System.out.println("Hashing bcut "+i+" "+bcut[i]);
 		    }
 			
 			Arrays.sort(atomBondBcutHash);
@@ -101,8 +104,8 @@ public class ECFPFeature implements IFeature {
 			hashCode=Arrays.hashCode(featureHash);
 		}
 		
-		//System.out.println("substructure= "+featureToString(true));
-		//System.out.println("hashCode= "+hashCode);
+		//System.out.println("substructure = "+featureToString(true));
+		//System.out.println("hashCode (is substructure hash="+isSubstructureHash()+") = "+hashCode);
 		//System.out.println("====================");
 		return hashCode;
 	}

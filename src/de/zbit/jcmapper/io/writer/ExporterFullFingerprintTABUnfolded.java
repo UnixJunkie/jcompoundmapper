@@ -37,10 +37,10 @@ public class ExporterFullFingerprintTABUnfolded implements IExporter {
 			double featureCount = 0.0;
 			Long start = System.currentTimeMillis();
 			
-			if(fingerprinter.getNameOfFingerPrinter().equals("ECFP")){
-	        	//switch on substructure hashes, aka do not use default iteration and parent hash lists
-	        	((Encoding2DECFP)fingerprinter).setSubstructureHash(true);
-	         }
+			//if(fingerprinter.getNameOfFingerPrinter().equals("ECFP")){
+	        //	//switch on substructure hashes, aka do not use default iteration and parent hash lists
+	        //	((Encoding2DECFP)fingerprinter).setSubstructureHash(true);
+	        // }
 			
 			ProgressBar progressBar = new ProgressBar(reader.getSize());
 			for (int i = 0; i < reader.getSize(); i++) {

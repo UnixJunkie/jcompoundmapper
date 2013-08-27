@@ -39,10 +39,10 @@ public class ExporterSQLite implements IExporter {
 		fingerprinterName=fingerprinterName.replace(' ', '_');
 		fingerprinterName=fingerprinterName.replace('-', '_');
 		
-		if(fingerprinter.getNameOfFingerPrinter().equals("ECFP")){
-	      	//switch on substructure hashes, aka do not use default iteration and parent hash lists
-	      	((Encoding2DECFP)fingerprinter).setSubstructureHash(true);
-	       }
+		//if(fingerprinter.getNameOfFingerPrinter().equals("ECFP")){
+	    //  	//switch on substructure hashes, aka do not use default iteration and parent hash lists
+	    //  	((Encoding2DECFP)fingerprinter).setSubstructureHash(true);
+	    //   }
 
 		final String tableDictionary="dictionary"+fingerprinterName;
 		final String tableFingerprint="fingerprint"+fingerprinterName;

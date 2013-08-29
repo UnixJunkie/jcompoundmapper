@@ -24,9 +24,8 @@ public class ExporterFactory {
 			return new ExporterSQLite();
 		} else if (type == ExporterType.SDF_PROPERTY) {
 			return new ExporterSDFProperty();
-				
-		/* } else if (type == ExporterType.NUMERIC_SQLITE) {
-			return new ExporterNumericSQLite();*/
+		} else if (type == ExporterType.NUMERIC_SQLITE) {
+			return new ExporterNumericSQLite();
 		}
 		return new ExporterLIBSVMSparse();
 	}

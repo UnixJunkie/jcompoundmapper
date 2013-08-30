@@ -34,10 +34,6 @@ public class Encoding2DECFP extends Encoding2D {
 	public Encoding2DECFP(){
 		this.setAtomLabelType(AtomLabelType.DAYLIGHT_INVARIANT_RING);
 	}
-	
-	public IAtomContainer getMolecule() {
-		return molecule;
-	}
 
 	@Override
 	public ArrayList<IFeature> getFingerprint(IAtomContainer molecule){
@@ -62,6 +58,9 @@ public class Encoding2DECFP extends Encoding2D {
 			computeIteration();
 		}
 		
+		// wegner: this is still ugly, I would prefer the molecule is persistent within this object, which it is only 
+		//      for the lifetime of a calculateFingerprint function call, very strange design, and not in a good way.
+		//      Anyway, workaround is to pass a molecule object along to the ECFPFeature as workaround.
 		this.featuresOfLastIteration=null;
 		this.molecule=null;
 	}
@@ -74,7 +73,7 @@ public class Encoding2DECFP extends Encoding2D {
 				substructure.addBond(bond);
 			}
 			//System.out.println("initial "+this.getAtomLabel(atom)+",id="+this.getAtomLabel(atom).hashCode());
-			ECFPFeature ecfpFeature = new ECFPFeature(this, atom, substructure,this.iteration,this.getAtomLabel(atom).hashCode(), null);
+			ECFPFeature ecfpFeature = new ECFPFeature(this, molecule, atom, substructure,this.iteration,this.getAtomLabel(atom).hashCode(), null);
 			this.featuresOfLastIteration.put(atom, ecfpFeature);
 			completeFeatures.add(ecfpFeature);
 		}
@@ -115,7 +114,7 @@ public class Encoding2DECFP extends Encoding2D {
 			}
 		}
 		
-		ECFPFeature newFeature = new ECFPFeature(this, atom, newSubstructure, this.iteration,oldFeature.hashCode(), connectivity);
+		ECFPFeature newFeature = new ECFPFeature(this, molecule, atom, newSubstructure, this.iteration,oldFeature.hashCode(), connectivity);
 		return newFeature;
 	}
 	

@@ -43,10 +43,10 @@ public class ExporterNumericSQLite implements IExporter {
       fingerprinterName = fingerprinterName.replace(' ', '_');
       fingerprinterName = fingerprinterName.replace('-', '_');
       
-      if(fingerprinter.getNameOfFingerPrinter().equals("ECFP")){
-      	//switch on substructure hashes, aka do not use default iteration and parent hash lists
-      	((Encoding2DECFP)fingerprinter).setSubstructureHash(true);
-       }
+      //if(fingerprinter.getNameOfFingerPrinter().equals("ECFP")){
+      //	//switch on substructure hashes, aka do not use default iteration and parent hash lists
+      //	((Encoding2DECFP)fingerprinter).setSubstructureHash(true);
+      // }
      
       final String tableDictionary = "dictionary" + fingerprinterName;
       final String tableFingerprint = "fingerprint" + fingerprinterName;
@@ -87,8 +87,10 @@ public class ExporterNumericSQLite implements IExporter {
          String molLabel = (String) mol.getProperty(label);
          if (molLabel != null) {
             featureMap.setLabel(molLabel);
+            System.out.println(molLabel);
          } else {
             featureMap.setLabel(ExporterHelper.getMolName(mol) + "_INDEX=" + cmpdCounter);
+            //System.out.println(ExporterHelper.getMolName(mol) + "_INDEX=" + cmpdCounter);
          }
 
          String cmpdLabel = featureMap.getLabel();
@@ -140,23 +142,23 @@ public class ExporterNumericSQLite implements IExporter {
             fpValue = feature.getValue();
             try {
                if(storeFingerprintSimilarity && fingerprinterName.equals("ECFP")){
-                  ECFPFeature eFeature = (ECFPFeature)feature.getFeature();
-                  IMolecule substructure = eFeature.representedSubstructure();
-                  int nAtoms = substructure.getAtomCount();
+            	  ECFPFeature eFeature = (ECFPFeature)feature.getFeature();
+            	  IMolecule substructure = eFeature.representedSubstructure();
+            	  int nAtoms = substructure.getAtomCount();
                   int nBonds = substructure.getBondCount();
                   int iteration = eFeature.getIterationNumber();
                   int parent = eFeature.getParent();
                   int nDoubleBonds = 0;
-                  for (int bi = 0; bi < nBonds; bi++) {
+            	  for (int bi = 0; bi < nBonds; bi++) {
                      IBond iBond = substructure.getBond(bi);
                      if (iBond.getOrder() == IBond.Order.DOUBLE) {
                         nDoubleBonds++;
                      }
                   }
-                  double fpp[] = ((ECFPFeature)feature.getFeature()).getBcutProperties();
-                  db.exec("INSERT INTO " + tableDictionary + "(encoding, fp, bc1, bc2, bc3, bc4, bc5, bc6,doublebonds,atoms,iteration,parent) VALUES ('" + featureString + "','" + fpInteger + "','" + fpp[0] + "','" + fpp[1] + "','" + fpp[2] + "','" + fpp[3] + "','" + fpp[4] + "','" + fpp[5] + "','"  + nDoubleBonds + "','" + nAtoms + "','" + iteration  + "','" + parent + "');");
+            	  double fpp[] = ((ECFPFeature)feature.getFeature()).getBcutProperties();
+            	  db.exec("INSERT INTO " + tableDictionary + "(encoding, fp, bc1, bc2, bc3, bc4, bc5, bc6,doublebonds,atoms,iteration,parent) VALUES ('" + featureString + "','" + fpInteger + "','" + fpp[0] + "','" + fpp[1] + "','" + fpp[2] + "','" + fpp[3] + "','" + fpp[4] + "','" + fpp[5] + "','"  + nDoubleBonds + "','" + nAtoms + "','" + iteration  + "','" + parent + "');");
                } else{
-                  db.exec("INSERT INTO " + tableDictionary + "(encoding, fp) VALUES ('" + featureString + "','" + fpInteger + "');");
+            	   db.exec("INSERT INTO " + tableDictionary + "(encoding, fp) VALUES ('" + featureString + "','" + fpInteger + "');");
                }
             } 
             catch (SQLiteException e) {       
@@ -175,6 +177,7 @@ public class ExporterNumericSQLite implements IExporter {
          } 
          catch (SQLiteException e) {
             System.out.println(e);
+            e.printStackTrace();
          }
          progressBar.DisplayBar();
          cmpdCounter = cmpdCounter + 1;

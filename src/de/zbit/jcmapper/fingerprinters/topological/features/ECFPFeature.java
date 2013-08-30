@@ -34,14 +34,16 @@ public class ECFPFeature implements IFeature {
 	private int parent;
 	private List<BondOrderIdentifierTupel> connections;
 	private EncodingFingerprint encodingFingerprint;
+	private IAtomContainer parentMolecule; 
 	
-	public ECFPFeature(EncodingFingerprint encodingFingerprint,IAtom coreAtom, IMolecule substructure, int iterationNumber, int parent, List<BondOrderIdentifierTupel> connections) {
+	public ECFPFeature(EncodingFingerprint encodingFingerprint, IAtomContainer parentMolecule, IAtom coreAtom, IMolecule substructure, int iterationNumber, int parent, List<BondOrderIdentifierTupel> connections) {
 		this.substructure = substructure;
 		this.coreAtom = coreAtom;
 		this.iterationNumber = iterationNumber;
 		this.parent = parent;
 		this.connections = connections;
 		this.encodingFingerprint=encodingFingerprint;
+		this.parentMolecule = parentMolecule;
 
 		//needs to be the last function call in the constructor
 		this.feature=0;
@@ -234,11 +236,12 @@ public class ECFPFeature implements IFeature {
 	}
 	
 	public double[] getBcutProperties() {
+		//System.out.println("entering bcut");
 		      double fingerprintProperties[] = null;
 		      IMolecule imol = this.representedSubstructure();
-		      ArrayList<Integer> al = new ArrayList<Integer>(); 
+		      ArrayList<Integer> al = new ArrayList<Integer>();
 		      for(IAtom atom: imol.atoms()){
-		    	 Integer atomNumber=new Integer(((Encoding2DECFP)this.encodingFingerprint).getMolecule().getAtomNumber(atom));
+		    	 Integer atomNumber=new Integer(parentMolecule.getAtomNumber(atom));
 		         al.add(atomNumber);
 		         //System.out.println("atom index "+atomNumber+" element "+atom.getSymbol()+" type "+atom.getAtomTypeName());
 		      }
@@ -248,7 +251,7 @@ public class ECFPFeature implements IFeature {
 		      }
 		      IMolecule imolsub = null;
 		      try {
-		         imolsub = (IMolecule) extractSubstructure(((Encoding2DECFP)this.encodingFingerprint).getMolecule(),aindices);
+		         imolsub = (IMolecule) extractSubstructure(parentMolecule,aindices);
 		      } catch (CloneNotSupportedException e) {
 		         // TODO Auto-generated catch block
 		         e.printStackTrace();
@@ -261,7 +264,9 @@ public class ECFPFeature implements IFeature {
 		      int precision = 1; //keep 0 digits
 		      for (int iii = 0; iii < 6; iii++) {
 		         fingerprintProperties[iii] = Math.floor(BCUTvalue.get(iii) * precision +.5)/precision;
+		         //System.out.println(fingerprintProperties[iii]);
 		      }
+		      //System.out.println("return fingerprintProperties");
 		      return fingerprintProperties;
 		   }
 	   

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.openscience.cdk.PseudoAtom;
 import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.interfaces.IMolecule;
 import org.openscience.cdk.smiles.SmilesGenerator;
@@ -16,8 +17,8 @@ public class ECFPVariantFeature extends ECFPFeature {
 
 	private final DanglingBond[] connectivityBonds;
 	
-	public ECFPVariantFeature(EncodingFingerprint encodingFingerprint, IAtom coreAtom, IMolecule substructure, DanglingBond[] connectivityBonds, int iterationNumber, int parent, List<BondOrderIdentifierTupel> connections) {
-		super(encodingFingerprint, coreAtom, substructure, iterationNumber, parent, connections);
+	public ECFPVariantFeature(EncodingFingerprint encodingFingerprint, IAtomContainer parentMolecule, IAtom coreAtom, IMolecule substructure, DanglingBond[] connectivityBonds, int iterationNumber, int parent, List<BondOrderIdentifierTupel> connections) {
+		super(encodingFingerprint, parentMolecule, coreAtom, substructure, iterationNumber, parent, connections);
 		this.connectivityBonds = connectivityBonds;
 	}
 
